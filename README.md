@@ -17,7 +17,7 @@ For any issues, questions and ideas turn to the Issues tab.
         storge c h
         output_stream c h
 
-assembler.c:
+### assembler.c:
     (*) main:
         1) Proccess every file from args
         2) For each file:
@@ -28,7 +28,7 @@ assembler.c:
             e) If is_success == True: build output files. output_stream.c -> build_output_files() -> bool
             f) Else: erros output
 
-pre_assembler.c:
+### pre_assembler.c:
     (*) macro_phase_process(*source_file) -> return bool: 
         1) Define and assign variables like macro_table. table.c -> init_macro_table()
         2) Copy file to New file (will be source file after macro spreading). utils.c -> copyFile(file_name) -> returns new file path.
@@ -48,7 +48,7 @@ pre_assembler.c:
         6) Free macro_table. table.c -> free_macro_table() -> return bool.
         7) return new_source_file_pnt -> *FILE.
 
-first_phase.c:
+### first_phase.c:
     (*) first_phase_process(*after_macro_phase_source_file) -> bool:
         1) Define and assign variables like is_success = True
         2) table.c -> init_signs_table().
@@ -75,7 +75,7 @@ first_phase.c:
         4) If errors found, *STOP-HERE* and return is_success -> bool.
         5) ICF, DCF, data signs update. storge.c -> pre_second_phase_data_update() -> bool
 
-second_phase.c:
+### second_phase.c:
     (*) second_phase_process(after_macro_phase_source_file, is_success) -> bool:
         1) Read line from after_macro_phase_source_file. If end of file, got to (2).
             a) If first operand is Label, skip it to next operand.
@@ -86,7 +86,7 @@ second_phase.c:
             d) Finish encoding info-words.storge.c -> second_encode_instruction(instruction[0], instruction[1], ...) -> {}
         2) Return bool.
 
-storge.c:
+### storge.c:
     (**) static DC = 0, IC = 100, DCF, ICF, data_storge, code_storge
     (*) storge_init() -> bool:
         1) Initialize each structure and simple data types.
@@ -105,10 +105,10 @@ storge.c:
         1) Update ICF and DCF. [Will be used after second_phase].
         2) Update base and east for each data sign in signs_table.
 
-output_stream.c:
+### output_stream.c:
     (*) build_output_files(file_name) -> bool
 
-table.c:
+### table.c:
     (**) funcs_table, macros_table, signs_table, registers_table
     (*) init_macro_table() -> bool.
     (*) insert_macro(macro_name, line) -> returns bool.
@@ -118,10 +118,10 @@ table.c:
     (*) is_func_exist(func_name) -> returns bool.
     (*) update_entry(label_name) -> bool.
 
-utils.c:
+### utils.c:
     (*) get_line_info(file_path) -> line_info
     (*) copyFile(file_name) -> returns new file path
 
-globals.h:
+### globals.h:
     (***) typedef struct line_info: label, func, operands
     (***) 
