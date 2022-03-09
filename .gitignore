@@ -1,0 +1,5 @@
+# Project exclude paths
+.vscode
+.vscode/*
+*.o
+assembler
