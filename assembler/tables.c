@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "globals.h"
 #include "tables.h"
 
@@ -78,7 +79,8 @@ bool insert_macro(char *macro_name, char *new_line)
  */
 char *get_macro_code(char *macro_name)
 {
-    return macro_name;
+	/* If not exist return NULL */
+    return NULL;
 }
 
 /**

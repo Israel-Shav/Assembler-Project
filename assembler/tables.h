@@ -157,7 +157,7 @@ typedef struct macro {
 	/* Name of macro */
 	char *name;
 	/* Macro's data */
-	char *data
+	char *data;
 } macro;
 
 /* Represents label object */
@@ -169,7 +169,7 @@ typedef struct label {
     /* Offset */
 	int offset;
     /* Attributes */
-	char *attribute[2] = {NULL, NULL};
+	char *attribute[2];
 } label;
 
 typedef struct action_element {

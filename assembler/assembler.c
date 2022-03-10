@@ -1,14 +1,16 @@
 /*
     Program: Assembler
-    Author: Israel Shalmiev and Roei
+    Author: Israel Shalmiev and Roei Levi
     
     Assembler for 15-instruction asssembly language, for an imaginary 16-bit CPU and 20 bits of memory size.
 */
+#include <stdio.h>
+#include <stdlib.h>
 #include "globals.h"
 #include "assembler.h"
 #include "output_producer.h"
 #include "pre_assembler.h"
-#include "first_phase.h"
+/* #include "first_phase.h" */
 #include "second_phase.h"
 #include "storage.h"
 #include "tables.h"
@@ -21,12 +23,13 @@ int main(int argc, char *argv[])
 {
 	/* To break line if needed */
 	bool succeeded;
+    int i;
 	/* Process each file from args */
-	for (int i = 1, succeeded = True; i < argc; i++) 
+	for (i = 1, succeeded = True; i < argc; i++) 
     {
 		/* New line if last file proccess failed */
-		if (!succeeded) 
-            puts("");
+		/* if (!succeeded) 
+            puts(""); */
 		/* Process each file */
 		succeeded = process_file(argv[i]);
 	}
@@ -39,29 +42,29 @@ static bool process_file(char *filename)
 	bool is_process_stable;
 	char *full_filename;
 
-    /* Initializing phase */
-    is_process_stable = init_macro_table();
-
     /* Macro phase: save a pointer to macrolated file */
-    if (is_process_stable)
-        is_process_stable = ((full_filename = macro_phase_process(filename)) != NULL);
+    is_process_stable = ((full_filename = macro_phase_process(filename)) != NULL);
     
     /* Continue initializing phase: update status if the process is succeed */
-    if (is_process_stable)
+    /*if (is_process_stable)
         is_process_stable = init_storage();
     if (is_process_stable)
-        is_process_stable = init_signs_table();
+        is_process_stable = init_signs_table();*/
 
     /* Continue initializing phase and start first phase: update status if the process is succeed */
-    if (is_process_stable)
-        is_process_stable = first_phase_process(full_filename);
+   /* if (is_process_stable)
+        is_process_stable = first_phase_process(full_filename);*/
 
     /* Second phase: update status if the process is succeed */
-	if (is_process_stable)
-        is_process_stable = second_phase_process(full_filename);
+	/*if (is_process_stable)
+        is_process_stable = second_phase_process(full_filename);*/
+
+    /* Output phase: creates output files if process is stable */
+    /*if (is_process_stable)
+        build_output_files(filename);*/
 
     /* Garbage collector: */
-	/* Free all table */
+	/* Free all tables */
 	tables_dispose();
 	/* Free storage code and data buffers contents */
 	storage_dispose();

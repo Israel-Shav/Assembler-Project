@@ -26,17 +26,17 @@ For any issues, questions and ideas turn to the Issues tab.
         1) Proccess every file from args
         2) For each file:
             a) Define and assgin variables like is_success = True. storage.c -> storage_init()
-            b) pre_assembler phase. pre_assembler.c -> macro_phase_process(*source_file) -> returns char*.
+            b) pre_assembler phase. pre_assembler.c -> macro_phase_process(*filename) -> returns char*.
             c) is_success = First phase. first_phase.c -> first_phase_process(*new_source_file_path) -> bool
             d) is_success = is_success && Second phase. second_phase.c -> second_phase_process(*new_source_file_path, is_success) -> bool
-            e) If is_success == True: build output files. output_producer.c -> build_output_files() -> bool
+            e) If is_success == True: build output files. output_producer.c -> build_output_files() -> void
             f) Else: erros output
 
 ### pre_assembler.c:
-    (*) macro_phase_process(*source_file) -> return bool: 
-        1) Define and aslabel variables like macro_table. tables.c -> init_macro_table()
-        2) Copy file to New file (will be source file after macro spreading). utils.c -> copyFile(file_name) -> returns new file path.
-        3) define is_in_macro_block = False, macro_name = NULL.
+    (*) macro_phase_process(*source_file) -> return char*: 
+        1) Define and assgin variables like macro_table. tables.c -> init_macro_table()
+        2) Copy file to New file (will be source file after macro spreading). utils.c -> getFileName(*path) -> returns char*.
+        3) define is_macro_block = False, macro_name = NULL.
         4) Read line from NEW source file. If end of file, go to (5).
             a) If is_macro_stream == True:
                 1) If first field is "endm":
@@ -111,7 +111,7 @@ For any issues, questions and ideas turn to the Issues tab.
     (*) storage_dispose() -> void.
 
 ### output_producer.c:
-    (*) build_output_files(file_name) -> bool
+    (*) build_output_files(filename) -> bool
 
 ### tables.c:
     (**) funcs_table, macros_table, labels_table, registers_table
@@ -125,8 +125,9 @@ For any issues, questions and ideas turn to the Issues tab.
     (*) tables_dispose() -> void.
 
 ### utils.c:
-    (*) get_line_info(file_path) -> line_info
-    (*) copyFile(file_name) -> returns new file path
+    (*) get_line_info(*file_path) -> line_info
+    (*) getFileName(*path) -> char*
+    (*) ifFileExist(*filename) -> bool
 
 ### globals.h:
     (***) typedef struct line_info: label, func, operands

@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "utils.h"
 #include "errors.h"
 
@@ -29,4 +32,20 @@ char *strallocat(char *s0, char* s1)
 	strcpy(str, s0);
 	strcat(str, s1);
 	return str;
+}
+
+
+/**
+ * Creates
+ * @param 
+ * @return 
+ */
+char *getFileName(char *path) {
+    char *retVal = path, *ptr;
+    for (ptr = path; *ptr; ptr++) {
+        if (*ptr == '/' || *ptr == '\\' || *ptr == ':') {
+            retVal = ptr;
+        }
+    }
+    return retVal;
 }

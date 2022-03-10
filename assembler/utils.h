@@ -22,6 +22,13 @@ void *malloc_with_check(long size);
 char *strallocat(char *s0, char* s1);
 
 /**
+ * Creates
+ * @param 
+ * @return 
+ */
+char *getFileName(char *path);
+
+/**
  * @brief Enums:
  */
 
