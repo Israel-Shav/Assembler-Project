@@ -46,16 +46,14 @@ static bool process_file(char *filename)
 
     /* Macro phase: save a pointer to macrolated file */
     is_process_stable = ((full_filename = macro_phase_process(filename)) != NULL);
-	
-	
 
     /* Continue initializing phase and start first phase: update status if the process is succeed */
     if (is_process_stable)
         is_process_stable = first_phase_process(full_filename);
 
     /* Second phase: update status if the process is succeed */
-	/*if (is_process_stable)
-        is_process_stable = second_phase_process(full_filename);*/
+	if (is_process_stable)
+        is_process_stable = second_phase_process(full_filename);
 
     /* Output phase: creates output files if process is stable */
     /*if (is_process_stable)

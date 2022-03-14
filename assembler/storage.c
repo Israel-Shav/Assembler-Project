@@ -42,7 +42,7 @@ bool first_encode_instruction(char *action, char *operands)
  * @brief 
  * @return if the process is stable
  */
-bool second_encode_instruction(char *instruction)
+bool second_encode_instruction(char *action, char *operands)
 {
     return True;
 }

@@ -204,6 +204,13 @@ typedef struct label {
 	char *attribute[2];
 } label;
 
+typedef struct {
+	label *labels_table;
+	unsigned int nLabels;
+	unsigned int size;
+	unsigned int block_size;
+} labels_list
+
 typedef struct action_element {
     /* Name of action */
 	char *action;

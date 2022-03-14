@@ -6,6 +6,7 @@
 
 #define NO_ERRORS_EC 0
 
+#define MEMORY_ALLOC_ERROR_IN(SEC) "Error: Fatal - Memory allocation failed in " #SEC ".\n"
 #define MEMORY_ALLOC_ERROR "Error: Fatal - Memory allocation failed.\n"
 #define MEMORY_ALLOC_ERROR_EC 1
 
@@ -21,6 +22,7 @@
 
 #define UNKOWN_INSTRUCTION(FILE, LINE, DATA) "Error in " #FILE ":" #LINE ": Unkown istructions.\n\tIn line: \"" #DATA "\""
 
+#define LABEL_NOT_FOUND_ADD_ENTRY(LABEL) "Error: " #LABEL " not found in labels table."
 
 /**
  * @brief Prototypes:

@@ -3,15 +3,12 @@
 #include <string.h>
 #include "globals.h"
 #include "tables.h"
+#include "errors.h"
 #include "utils.h"
 
 /**
  * @brief 
  */
-void tables_dispose()
-{
-    
-}
 
 /**
  *  
@@ -123,14 +120,28 @@ char *get_macro_code(char *macro_name)
  * 
  */
 
-static label **labels_table;
+static labels_list *labelsList;
 
 /**
  * @brief 
  * @return if the process is succeed
  */
-bool init_labels_table()
+static bool init_labels_table()
 {
+	labelsList = (labels_list *)malloc(sizeof(labels_list));
+	if(labelsList == NULL)
+	{
+		printf(MEMORY_ALLOC_ERROR_IN("table.c -> init_labels_table() -> labelsList"));
+		exit(MEMORY_ALLOC_ERROR_EC);
+	}
+	labelsList -> nLabels = 0;
+	labelsList -> labels_table =  (label *)malloc(labelsList -> block_size = labelsList -> size = sizeof(label));
+	if(labelsList -> labels_table == NULL)
+	{
+		free(labelsList);
+		printf(MEMORY_ALLOC_ERROR_IN("table.c -> init_labels_table() -> labels_table"));
+		exit(MEMORY_ALLOC_ERROR_EC);
+	}
     return True;
 }
 
@@ -140,6 +151,47 @@ bool init_labels_table()
  */
 bool insert_label(char *label_name, char *attribute, int base, int offset)
 {
+	if(labelsList == NULL && !init_labels_table())
+		return False;
+
+	unsigned int nLabels = labelsList->nLabels;
+    if (nLabels >= labelsList->size) {
+        unsigned int newSize = labelsList->size + labelsList->block_size;
+        void* newLabels = realloc(labelsList->labels_table, newSize); 
+        if (newLabels == NULL) 
+		{
+			labels_table_dispose();
+			printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label(,,,) -> newLabels"));
+            exit(1);
+        } 
+		else 
+		{    
+            labelsList->size = newSize;
+            labelsList->labels_table = (label*)newLabels;
+        }
+
+    }
+
+    labelsList->labels_table[nLabels]->label_name = (char *)malloc_with_check(strlen(label_name) + 1);
+	if (labelsList->labels_table[nLabels]->label_name == NULL) 
+	{
+		labels_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label() -> label_name"));
+		exit(1);
+	} 
+	strcpy(labelsList->labels_table[nLabels]->label_name, label_name);
+	labelsList->labels_table[nLabels]->base = base;
+	labelsList->labels_table[nLabels]->offset = offset;
+	labelsList->labels_table[nLabels]->attribute[0] = (char *)malloc_with_check(strlen(attribute) + 1);
+	if (labelsList->labels_table[nLabels]->attribute[0] == NULL) 
+	{
+		labels_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label() -> attribute[0]"));
+		exit(1);
+	} 
+	strcpy(labelsList->labels_table[nLabels]->attribute[0], attribute);
+    ++labelsList->nLabels;
+
     return True;
 }
 
@@ -149,7 +201,24 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
  */
 bool add_entry_attribute(char *label_name)
 {
-    return True;
+	int i = 0;
+	for(i = 0; i < labelsList->nLabels; i++)
+	{
+		if(strcmp(label_name, labelsList->labels_table[i]->label_name) == 0)
+		{
+			labelsList->labels_table[i]->attribute[1] = (char *)malloc_with_check(strlen(".entry") + 1);
+			if (labelsList->labels_table[i]->attribute[1] == NULL) 
+			{
+				labels_table_dispose();
+				printf(MEMORY_ALLOC_ERROR_IN("table.c -> add_entry_attribute() -> attribute[1]"));
+				exit(1);
+			} 
+			strcpy(labelsList->labels_table[i]->attribute[1], ".entry");
+			return True;
+		}
+	}
+	printf(LABEL_NOT_FOUND_ADD_ENTRY(*label_name));
+    return False;
 }
 
 /**
@@ -186,4 +255,25 @@ bool is_label(char *label_name)
 	}
 
 	return False; /* There was no error */
+}
+
+static void labels_table_dispose()
+{
+	/* Labels section*/
+	int i;
+	for(i = 0; i < labelsList->nLabels; i++)
+	{
+		free(labelsList->labels_table[i]->label_name);
+		free(labelsList->labels_table[i]->attribute[0]);
+		free(labelsList->labels_table[i]->attribute[1]);
+	}
+    free(labelsList->labels_table);
+    free(labelsList);
+}
+
+
+void tables_dispose()
+{
+	/* Labels section*/
+    labels_table_dispose();
 }
