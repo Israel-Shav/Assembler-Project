@@ -22,12 +22,12 @@ bool encode_data(char *attribute, char *data);
  * @brief 
  * @return if the process is succeed
  */
-bool first_encode_instruction(char *instruction);
+bool first_encode_instruction(char *action, char *operands);
 /**
  * @brief 
  * @return if the process is succeed
  */
-bool second_encode_instruction(char *instruction);
+bool second_encode_instruction(char *action, char *operands);
 
 /**
  * @brief 
@@ -39,7 +39,7 @@ bool pre_second_phase_data_update();
  * @brief 
  * @return dc VALUE
  */
-int get_dc()
+int get_dc();
 
 /**
  * @brief 

@@ -47,9 +47,11 @@ static bool process_file(char *filename)
     /* Macro phase: save a pointer to macrolated file */
     is_process_stable = ((full_filename = macro_phase_process(filename)) != NULL);
 
+
     /* Continue initializing phase and start first phase: update status if the process is succeed */
     if (is_process_stable)
         is_process_stable = first_phase_process(full_filename);
+	
 
     /* Second phase: update status if the process is succeed */
 	if (is_process_stable)
@@ -59,6 +61,8 @@ static bool process_file(char *filename)
     /*if (is_process_stable)
         build_output_files(filename);*/
 
+	print_label_table();
+
     /* Garbage collector: */
 	/* Free all tables */
 	tables_dispose();
@@ -66,6 +70,8 @@ static bool process_file(char *filename)
 	storage_dispose();
     /* Full file name */
 	free(full_filename);
+
+	print_label_table();
 
 	/* Returns if the process is succeed */
 	return is_process_stable;

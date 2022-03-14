@@ -1,4 +1,4 @@
-int i, j;
+	int i, j;
 	char symbol[MAX_LINE_LENGTH];
 	instruction instruction;
 
@@ -94,17 +94,6 @@ int i, j;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 /**
  * Processes a single code line in the first pass.
  * Adds the code build binary structure to the code_img,
@@ -115,90 +104,90 @@ int i, j;
  * @param code_img The code image array
  * @return Whether succeeded or notssss
  */
-// static bool process_code(line_info line, int i, long *ic, machine_word **code_img) {
-// 	char operation[8]; /* stores the string of the current code instruction */
-// 	char *operands[2]; /* 2 strings, each for operand */
-// 	opcode curr_opcode; /* the current opcode and funct values */
-// 	funct curr_funct;
-// 	code_word *codeword; /* The current code word */
-// 	long ic_before;
-// 	int j, operand_count;
-// 	machine_word *word_to_write;
-// 	/* Skip white chars */
-// 	MOVE_TO_NOT_WHITE(line.content, i)
+static bool process_code(line_info line, int i, long *ic, machine_word **code_img) {
+	char operation[8]; /* stores the string of the current code instruction */
+	char *operands[2]; /* 2 strings, each for operand */
+	opcode curr_opcode; /* the current opcode and funct values */
+	funct curr_funct;
+	code_word *codeword; /* The current code word */
+	long ic_before;
+	int j, operand_count;
+	machine_word *word_to_write;
+	/* Skip white chars */
+	MOVE_TO_NOT_WHITE(line.content, i)
 
-// 	/* Until white char, end of line, or too big instruction, copy it: */
-// 	for (j = 0; line.content[i] && line.content[i] != '\t' && line.content[i] != ' ' && line.content[i] != '\n' && line.content[i] != EOF && j < 6; i++, j++) {
-// 		operation[j] = line.content[i];
-// 	}
-// 	operation[j] = '\0'; /* End of string */
-// 	/* Get opcode & funct by command name into curr_opcode/curr_funct */
-// 	get_opcode_func(operation, &curr_opcode, &curr_funct);
-// 	/* If invalid operation (opcode is NONE_OP=-1), print and skip processing the line. */
-// 	if (curr_opcode == NONE_OP) {
-// 		printf_line_error(line, "Unrecognized instruction: %s.", operation);
-// 		return FALSE; /* an error occurred */
-// 	}
+	/* Until white char, end of line, or too big instruction, copy it: */
+	for (j = 0; line.content[i] && line.content[i] != '\t' && line.content[i] != ' ' && line.content[i] != '\n' && line.content[i] != EOF && j < 6; i++, j++) {
+		operation[j] = line.content[i];
+	}
+	operation[j] = '\0'; /* End of string */
+	/* Get opcode & funct by command name into curr_opcode/curr_funct */
+	get_opcode_func(operation, &curr_opcode, &curr_funct);
+	/* If invalid operation (opcode is NONE_OP=-1), print and skip processing the line. */
+	if (curr_opcode == NONE_OP) {
+		printf_line_error(line, "Unrecognized instruction: %s.", operation);
+		return FALSE; /* an error occurred */
+	}
 
-// 	/* Separate operands and get their count */
-// 	if (!analyze_operands(line, i, operands, &operand_count, operation))  {
-// 		return FALSE;
-// 	}
+	/* Separate operands and get their count */
+	if (!analyze_operands(line, i, operands, &operand_count, operation))  {
+		return FALSE;
+	}
 
-// 	/* Build code word struct to store in code image array */
-// 	if ((codeword = get_code_word(line, curr_opcode, curr_funct, operand_count, operands)) == NULL) {
-// 		/* Release allocated memory for operands */
-// 		if (operands[0]) {
-// 			free(operands[0]);
-// 			if (operands[1]) {
-// 				free(operands[1]);
-// 			}
-// 		}
-// 		return FALSE;
-// 	}
+	/* Build code word struct to store in code image array */
+	if ((codeword = get_code_word(line, curr_opcode, curr_funct, operand_count, operands)) == NULL) {
+		/* Release allocated memory for operands */
+		if (operands[0]) {
+			free(operands[0]);
+			if (operands[1]) {
+				free(operands[1]);
+			}
+		}
+		return FALSE;
+	}
 
-// 	/* ic in position of new code word */
-// 	ic_before = *ic;
+	/* ic in position of new code word */
+	ic_before = *ic;
 
-// 	/* allocate memory for a new word in the code image, and put the code word into it */
-// 	word_to_write = (machine_word *) malloc_with_check(sizeof(machine_word));
-// 	(word_to_write->word).code = codeword;
-// 	code_img[(*ic) -
-// 	         IC_INIT_VALUE] = word_to_write; /* Avoid "spending" cells of the array, by starting from initial value of ic */
+	/* allocate memory for a new word in the code image, and put the code word into it */
+	word_to_write = (machine_word *) malloc_with_check(sizeof(machine_word));
+	(word_to_write->word).code = codeword;
+	code_img[(*ic) -
+	         IC_INIT_VALUE] = word_to_write; /* Avoid "spending" cells of the array, by starting from initial value of ic */
 
-// 	/* Build extra information code word if possible, free pointers with no need */
-// 	if (operand_count--) { /* If there's 1 operand at least */
-// 		build_extra_codeword_fpass(code_img, ic, operands[0]);
-// 		free(operands[0]);
-// 		if (operand_count) { /* If there are 2 operands */
-// 			build_extra_codeword_fpass(code_img, ic, operands[1]);
-// 			free(operands[1]);
-// 		}
-// 	}
+	/* Build extra information code word if possible, free pointers with no need */
+	if (operand_count--) { /* If there's 1 operand at least */
+		build_extra_codeword_fpass(code_img, ic, operands[0]);
+		free(operands[0]);
+		if (operand_count) { /* If there are 2 operands */
+			build_extra_codeword_fpass(code_img, ic, operands[1]);
+			free(operands[1]);
+		}
+	}
 
-// 	(*ic)++; /* increase ic to point the next cell */
+	(*ic)++; /* increase ic to point the next cell */
 
-// 	/* Add the final length (of code word + data words) to the code word struct: */
-// 	code_img[ic_before - IC_INIT_VALUE]->length = (*ic) - ic_before;
+	/* Add the final length (of code word + data words) to the code word struct: */
+	code_img[ic_before - IC_INIT_VALUE]->length = (*ic) - ic_before;
 
-// 	return TRUE; /* No errors */
-// }
+	return TRUE; /* No errors */
+}
 
-// static void build_extra_codeword_fpass(machine_word **code_img, long *ic, char *operand) {
-// 	addressing_type operand_addressing = get_addressing_type(operand);
-// 	/* And again - if another data word is required, increase CI. if it's an immediate addressing, encode it. */
-// 	if (operand_addressing != NONE_ADDR && operand_addressing != REGISTER_ADDR) {
-// 		(*ic)++;
-// 		if (operand_addressing == IMMEDIATE_ADDR) {
-// 			char *ptr;
-// 			machine_word *word_to_write;
-// 			/* Get value of immediate addressed operand. notice that it starts with #, so we're skipping the # in the call to strtol */
-// 			long value = strtol(operand + 1, &ptr, 10);
-// 			word_to_write = (machine_word *) malloc_with_check(sizeof(machine_word));
-// 			word_to_write->length = 0; /* Not Code word! */
-// 			(word_to_write->word).data = build_data_word(IMMEDIATE_ADDR, value, FALSE);
+static void build_extra_codeword_fpass(machine_word **code_img, long *ic, char *operand) {
+	addressing_type operand_addressing = get_addressing_type(operand);
+	/* And again - if another data word is required, increase CI. if it's an immediate addressing, encode it. */
+	if (operand_addressing != NONE_ADDR && operand_addressing != REGISTER_ADDR) {
+		(*ic)++;
+		if (operand_addressing == IMMEDIATE_ADDR) {
+			char *ptr;
+			machine_word *word_to_write;
+			/* Get value of immediate addressed operand. notice that it starts with #, so we're skipping the # in the call to strtol */
+			long value = strtol(operand + 1, &ptr, 10);
+			word_to_write = (machine_word *) malloc_with_check(sizeof(machine_word));
+			word_to_write->length = 0; /* Not Code word! */
+			(word_to_write->word).data = build_data_word(IMMEDIATE_ADDR, value, FALSE);
 
-// 			code_img[(*ic) - IC_INIT_VALUE] = word_to_write;
-// 		}
-// 	}
-// }
+			code_img[(*ic) - IC_INIT_VALUE] = word_to_write;
+		}
+	}
+}

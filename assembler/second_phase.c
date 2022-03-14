@@ -1,26 +1,3 @@
-// ic = IC_INIT_VALUE;
-
-// 	/* Now let's add IC to each DC for each of the data symbols in table (step 1.19) */
-// 	add_value_to_type(symbol_table, icf, DATA_SYMBOL);
-
-// 	/* First pass done right. start second pass: */
-// 	rewind(file_des); /* Start from beginning of file again */
-
-// 	for (curr_line_info.line_number = 1; !feof(file_des); curr_line_info.line_number++) {
-// 		int i = 0;
-// 		fgets(temp_line, MAX_LINE_LENGTH, file_des); /* Get line */
-// 		MOVE_TO_NOT_WHITE(temp_line, i)
-// 		if (code_img[ic - IC_INIT_VALUE] != NULL || temp_line[i] == '.')
-// 			process_status &= process_line_spass(curr_line_info, &ic, code_img, &symbol_table);
-// 	}
-
-// 		/* Write files if second pass succeeded */
-// 		if (process_status) {
-// 			/* Everything was done. Write to *filename.ob/.ext/.ent */
-// 			process_status = write_output_files(code_img, data_img, icf, dcf, filename, symbol_table);
-// 		}
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,6 +7,19 @@
 #include "tables.h"
 #include "storage.h"
 #include "utils.h"
+
+/**
+ * @brief Static declartions: should be only in same file otherwise it will be copied
+ * 
+ */
+
+/**
+ * @brief Processes a single line in the second phase
+ * @param line The line text
+ * @param bool Indicates if process stable
+ * @return Whether succeeded.
+ */
+static bool sp_line_process(char *line, bool *is_process_stable, char *filename, int line_number);
 
 
 /**
@@ -72,7 +62,7 @@ bool second_phase_process(char *full_filename)
 		} 
 		else 
 		{
-			if (!fp_line_process(temp_line, &is_process_stable, full_filename, line_number) && is_process_stable)
+			if (!sp_line_process(temp_line, &is_process_stable, full_filename, line_number) && is_process_stable)
 				is_process_stable = False;
 		}
 	}
@@ -88,10 +78,8 @@ bool second_phase_process(char *full_filename)
  */
 static bool sp_line_process(char *line, bool *is_process_stable, char *filename, int line_number)
 {
-	
-	char *token, *current_label, *copy_line, *rest_of_str, *attribute;
+	char *token, *copy_line, *rest_of_str;
 	bool is_labeled;
-	current_label = NULL;
 	copy_line = (char *)malloc_with_check(strlen(line) + 1);
 	is_labeled = False;
 	strcpy(copy_line, line);
@@ -106,7 +94,6 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 	
 	if((is_labeled = is_label(token)))
 	{
-		current_label = token;
 		/* Get second token */
 		token = strtok(NULL, TOKENS_DELIMITERS);
 		if( token == NULL ) 
@@ -119,7 +106,6 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 
 	if(strcmp(token, ".entry") == 0)
 	{
-		attribute = token;
 		rest_of_str = strtok(NULL, NEW_LINE_STR);
 		if(rest_of_str == NULL)
 		{

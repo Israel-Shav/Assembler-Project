@@ -5,8 +5,7 @@ LFLAGS = -I. -lm
 
 # Files names
 HDRS = globals.h errors.h
-OBJS = objects/assembler.o  objects/pre_assembler.o objects/first_phase.o objects/output_producer.o objects/tables.o objects/storage.o objects/utils.o 
-OBJS_TO_COMMENT = objects/second_phase.o
+OBJS = objects/assembler.o  objects/pre_assembler.o objects/first_phase.o objects/second_phase.o objects/output_producer.o objects/tables.o objects/storage.o objects/utils.o 
 
 # Main execute file
 assembler: $(OBJS) 

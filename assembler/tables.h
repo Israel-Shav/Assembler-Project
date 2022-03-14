@@ -8,10 +8,6 @@
  * @brief Prototypes:
  */
 
-/**
- * @brief 
- */
-void tables_dispose();
 
 /**
  *  
@@ -26,6 +22,12 @@ void tables_dispose();
  * @return if label_name is label
  */
 bool is_data_instruction(char *instruction_word);
+
+/**
+ * @brief 
+ * @return if instruction_word is .extern or .entry
+ */
+bool is_linked_instruction(char *instruction_word);
 
 /**
  *  
@@ -65,18 +67,13 @@ bool insert_macro(char *macro_name, char *new_line);
  */
 char *get_macro_code(char *macro_name);
 
+
 /**
  *  
  * 
  *  @brief Labels table section:
  * 
  */
-
-/**
- * @brief 
- * @return if the process is succeed
- */
-bool init_labels_table();
 
 /**
  * @brief 
@@ -97,18 +94,25 @@ bool add_entry_attribute(char *label_name);
 bool is_label(char *label_name);
 
 /**
+ * @brief 
+ */
+void tables_dispose();
+
+void print_label_table();
+
+/**
  * @brief Enums:
  */
 
 /* Instructions*/
-typedef enum instruction {
+/* typedef enum instruction {
 	DATA_INST,
 	EXTERN_INST,
 	ENTRY_INST,
 	STRING_INST,
 	NONE_INST,
 	ERROR_INST
-} instruction;
+} instruction; */
 
 /* Commands opcode */
 typedef enum opcodes {
@@ -204,12 +208,12 @@ typedef struct label {
 	char *attribute[2];
 } label;
 
-typedef struct {
+typedef struct labels_list {
 	label *labels_table;
 	unsigned int nLabels;
 	unsigned int size;
 	unsigned int block_size;
-} labels_list
+} labels_list;
 
 typedef struct action_element {
     /* Name of action */

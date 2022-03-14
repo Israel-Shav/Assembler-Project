@@ -8,6 +8,21 @@
 #include "utils.h"
 
 /**
+ * @brief Static declartions: should be only in same file otherwise it will be copied
+ * 
+ */
+
+/**
+ * @brief Processes a single line in the macro phase
+ * @param line The line text
+ * @param is_macro_block Is reading macro block
+ * @param macro_name Macro name
+ * @return Whether succeeded.
+ */
+static bool macro_line_process(char *line, bool *is_macro_block, char *macro_name, FILE* new_file);
+
+
+/**
  * @brief Creates copy of source file, replace any macro statement with its content and removes unnecessary macros definitions (removes comments in macro defenitions too)
  * @param filename Extensionless file name
  * @return After macro phase edit source file

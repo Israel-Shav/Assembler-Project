@@ -1,15 +1,11 @@
 #include "globals.h"
 #include "storage.h"
 
-static int DC = 0;
+static int DC, IC, DCF, ICF;
 
-static int IC = 100;
+static machine_word *data_storage;
 
-static int DCF, ICF;
-
-static machine_word **data_storage;
-
-static machine_word **code_storage;
+static machine_word *code_storage;
 
 /**
  * @brief 
@@ -17,6 +13,10 @@ static machine_word **code_storage;
  */
 bool init_storage()
 {
+    DC = 0;
+    IC = 100;
+    DCF = -1;
+    ICF = -1;
     return True;
 }
 

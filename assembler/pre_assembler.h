@@ -21,14 +21,6 @@
  */
 char *macro_phase_process(char *filename);
 
-/**
- * @brief Processes a single line in the macro phase
- * @param line The line text
- * @param is_macro_block Is reading macro block
- * @param macro_name Macro name
- * @return Whether succeeded.
- */
-static bool macro_line_process(char *line, bool *is_macro_block, char *macro_name, FILE* new_file);
 
 /**
  * @brief Enums:
