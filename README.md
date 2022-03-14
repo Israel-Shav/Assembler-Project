@@ -22,35 +22,12 @@ For any issues, questions and ideas turn to the Issues tab.
         output_producer c h
 
 ### assembler.c:
-    (*) main:
-        1) Proccess every file from args
-        2) For each file:
-            a) Define and assgin variables like is_success = True. storage.c -> storage_init()
-            b) pre_assembler phase. pre_assembler.c -> macro_phase_process(*filename) -> returns char*.
-            c) is_success = First phase. first_phase.c -> first_phase_process(*new_source_file_path) -> bool
-            d) is_success = is_success && Second phase. second_phase.c -> second_phase_process(*new_source_file_path, is_success) -> bool
-            e) If is_success == True: build output files. output_producer.c -> build_output_files() -> void
-            f) Else: erros output
+    (*) main(int argc, char *argv[]) -> int
+    (*) static process_file(char *filename) -> bool
 
 ### pre_assembler.c:
-    (*) macro_phase_process(*source_file) -> return char*: 
-        1) Define and assgin variables like macro_table. tables.c -> init_macro_table()
-        2) Copy file to New file (will be source file after macro spreading). utils.c -> getFileName(*path) -> returns char*.
-        3) define is_macro_block = False, macro_name = NULL.
-        4) Read line from NEW source file. If end of file, go to (5).
-            a) If is_macro_stream == True:
-                1) If first field is "endm":
-                    a) is_macro_stream = False, macro_name = NULL.
-                2) Else:
-                    a) Insert line to macro_table. tables.c -> insert_macro(macro_name, line) -> returns bool.
-                3) Delete line from new source file.
-            b) Go to (4).
-        5) Read line from begining of NEW source file. If end of file go to (6).
-            b) If first field is a macro that appear in macro_table:
-                1) Replace it with macro conent from macro_table. tables.c -> get_macro_code(macro_name) -> *char
-                2) Return to (5).
-        6) Free macro_table. tables.c -> free_macro_table() -> return bool.
-        7) return new_source_file_pnt -> *FILE.
+    (*) macro_phase_process(char *filename) -> char*
+    (*) static macro_line_process(char *line, bool *is_macro_block, char *macro_name, FILE* new_file) -> bool
 
 ### first_phase.c:
     (*) first_phase_process(*after_macro_phase_source_file) -> bool:
@@ -60,7 +37,7 @@ For any issues, questions and ideas turn to the Issues tab.
             a) Define and aslabel variables like current_label = NULL, is_label = False.
             b) If first operand is Label:
                 1) is_label = True
-                2) Aslabel current_label
+                2) As label current_label
             c) If data instruction (.data or .string):
                 1) Encode data into storage. storage.c -> encode_data(attribute, data[0], data[1], ...) -> [base, offset]
                 2) If is_label == True:
@@ -77,10 +54,10 @@ For any issues, questions and ideas turn to the Issues tab.
             g) Encode instruction into storage. storage.c -> first_encode_instruction(instruction[0], instruction[1], ...) -> {}
             h) returns to (3)
         4) If errors found, *STOP-HERE* and return is_success -> bool.
-        5) ICF, DCF, data labels update. storage.c -> pre_second_phase_data_update() -> bool
 
 ### second_phase.c:
     (*) second_phase_process(after_macro_phase_source_file, is_success) -> bool:
+        0.5) ICF, DCF, data labels update. storage.c -> pre_second_phase_data_update() -> bool
         1) Read line from after_macro_phase_source_file. If end of file, got to (2).
             a) If first operand is Label, skip it to next operand.
             b) If operand is .extern, .string, .data: return to (1).

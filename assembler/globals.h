@@ -7,6 +7,16 @@
 
 #define TOKENS_DELIMITERS "\n\t\r "
 
+#define COMMENT ';'
+
+#define NEW_LINE '\n'
+
+#define NEW_LINE_STR "\n"
+
+#define READ_PERMISSIONS "r"
+
+#define WRITE_PERMISSIONS "w"
+
 /**
  * @brief Prototypes:
  */

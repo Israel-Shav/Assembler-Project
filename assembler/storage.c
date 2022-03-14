@@ -13,7 +13,7 @@ static machine_word **code_storage;
 
 /**
  * @brief 
- * @return if the process is succeed
+ * @return if the process is stable
  */
 bool init_storage()
 {
@@ -22,25 +22,25 @@ bool init_storage()
 
 /**
  * @brief 
- * @return if the process is succeed
+ * @return if the process is stable
  */
-bool encode_data(char *attribute, int data_len, ...)
+bool encode_data(char *attribute, char *data)
 {
     return True;
 }
 
 /**
  * @brief 
- * @return if the process is succeed
+ * @return if the process is stable
  */
-bool first_encode_instruction(char *instruction)
+bool first_encode_instruction(char *action, char *operands)
 {
     return True;
 }
 
 /**
  * @brief 
- * @return if the process is succeed
+ * @return if the process is stable
  */
 bool second_encode_instruction(char *instruction)
 {
@@ -49,11 +49,20 @@ bool second_encode_instruction(char *instruction)
 
 /**
  * @brief 
- * @return if the process is succeed
+ * @return if the process is stable
  */
 bool pre_second_phase_data_update()
 {
     return True;
+}
+
+/**
+ * @brief 
+ * @return DC value
+ */
+int get_dc()
+{
+    return DC;
 }
 
 /**

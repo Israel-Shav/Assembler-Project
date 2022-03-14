@@ -2,6 +2,8 @@
  * @brief Constants:
  */
 
+#define MAX_LABEL_LEN 31
+
 /**
  * @brief Prototypes:
  */
@@ -10,6 +12,20 @@
  * @brief 
  */
 void tables_dispose();
+
+/**
+ *  
+ * 
+ *  @brief Instructions table section:
+ * 
+ */
+
+
+/**
+ * @brief 
+ * @return if label_name is label
+ */
+bool is_data_instruction(char *instruction_word);
 
 /**
  *  
@@ -75,8 +91,24 @@ bool insert_label(char *label_name, char *attribute, int base, int offset);
 bool add_entry_attribute(char *label_name);
 
 /**
+ * @brief 
+ * @return if label_name is label
+ */
+bool is_label(char *label_name);
+
+/**
  * @brief Enums:
  */
+
+/* Instructions*/
+typedef enum instruction {
+	DATA_INST,
+	EXTERN_INST,
+	ENTRY_INST,
+	STRING_INST,
+	NONE_INST,
+	ERROR_INST
+} instruction;
 
 /* Commands opcode */
 typedef enum opcodes {

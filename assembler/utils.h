@@ -2,6 +2,11 @@
  * @brief Constants:
  */
 
+/* moves the index to the next place in string where the char isn't white */
+#define SKIP_WHITE_CHARS(string, index) \
+        for (;string[(index)] && (string[(index)] == '\t' || string[(index)] == ' '); (++(index)))\
+        ;
+
 /**
  * @brief Prototypes:
  */

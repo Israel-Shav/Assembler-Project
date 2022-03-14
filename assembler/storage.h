@@ -16,7 +16,7 @@ bool init_storage();
  * @brief 
  * @return if the process is succeed
  */
-bool encode_data(char *attribute, int data_len, ...);
+bool encode_data(char *attribute, char *data);
 
 /**
  * @brief 
@@ -34,6 +34,12 @@ bool second_encode_instruction(char *instruction);
  * @return if the process is succeed
  */
 bool pre_second_phase_data_update();
+
+/**
+ * @brief 
+ * @return dc VALUE
+ */
+int get_dc()
 
 /**
  * @brief 

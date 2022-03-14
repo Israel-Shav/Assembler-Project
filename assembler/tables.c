@@ -1,6 +1,9 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "globals.h"
 #include "tables.h"
+#include "utils.h"
 
 /**
  * @brief 
@@ -8,6 +11,36 @@
 void tables_dispose()
 {
     
+}
+
+/**
+ *  
+ * 
+ *  @brief Instructions table section:
+ * 
+ */
+
+
+/**
+ * @brief 
+ * @return if instruction_word is .string ot .data
+ */
+bool is_data_instruction(char *instruction_word)
+{
+	if (strcmp(instruction_word, ".string") == 0 || strcmp(instruction_word, ".data") == 0)
+		return True;
+	return False;
+}
+
+/**
+ * @brief 
+ * @return if instruction_word is .extern or .entry
+ */
+bool is_linked_instruction(char *instruction_word)
+{
+	if (strcmp(instruction_word, ".extern") == 0 || strcmp(instruction_word, ".entry") == 0)
+		return True;
+	return False;
 }
 
 /**
@@ -117,4 +150,40 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
 bool add_entry_attribute(char *label_name)
 {
     return True;
+}
+
+/**
+ * @brief 
+ * @return if label_name is label
+ */
+bool is_label(char *label_name)
+{
+	int i = 0;
+
+	/* Skip white chars at the beginning anyway */
+	SKIP_WHITE_CHARS(label_name, i)
+
+	/* Let's allocate some memory to the string needed to be returned */
+	for (; label_name[i] && 
+			label_name[i] != ':' && 
+			label_name[i] != ' ' && 
+			label_name[i] != '\t' && 
+			label_name[i] != '\n' && 
+			label_name[i] != EOF && 
+			i <= MAX_LINE_LENGTH;
+			 i++)
+		;
+
+	/* if it was a try to define label, print errors if needed. */
+	if (label_name[i] == ':')
+	{ 
+		i++;
+		if(label_name[i] && label_name[i] != ' ' && label_name[i] != '\t' && 
+			label_name[i] != '\n' && label_name[i] != EOF )
+			return False;
+
+		return True;
+	}
+
+	return False; /* There was no error */
 }

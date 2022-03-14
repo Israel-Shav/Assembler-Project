@@ -10,21 +10,14 @@
 
 #define MACRO_END_STATEMENT "endm"
 
-#define COMMENT ";"
-
-#define NEW_LINE "\n"
-
-#define READ_PERMISSIONS "r"
-
-#define WRITE_PERMISSIONS "w"
-
 /**
  * @brief Prototypes:
  */
 
 /**
- * @brief 
+ * @brief Creates copy of source file, replace any macro statement with its content and removes unnecessary macros definitions
  * @param filename Extensionless file name
+ * @return After macro phase edit source file
  */
 char *macro_phase_process(char *filename);
 
@@ -35,7 +28,7 @@ char *macro_phase_process(char *filename);
  * @param macro_name Macro name
  * @return Whether succeeded.
  */
-static bool line_process(char *line, bool *is_macro_block, char *macro_name, FILE* new_file);
+static bool macro_line_process(char *line, bool *is_macro_block, char *macro_name, FILE* new_file);
 
 /**
  * @brief Enums:
