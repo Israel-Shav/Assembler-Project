@@ -26,6 +26,7 @@ bool init_storage()
  */
 bool encode_data(char *attribute, char *data)
 {
+    DC++;
     return True;
 }
 

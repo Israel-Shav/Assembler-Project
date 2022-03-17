@@ -1,7 +1,7 @@
 # Commands and flags
-CC = gcc 
-CFLAGS = -Wall -ansi -pedantic
-LFLAGS = -I. -lm
+CC = gcc -g 
+CFLAGS = -Wall -ansi -pedantic 
+LFLAGS = -I. -lm 
 
 # Files names
 HDRS = globals.h errors.h

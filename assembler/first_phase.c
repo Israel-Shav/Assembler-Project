@@ -43,7 +43,7 @@ bool first_phase_process(char *full_filename)
 	if (file_des == NULL) 
 	{
 		/* if file couldn't be opened, write to stderr. */
-		printf(READING_PERMISSIONS_ERROR(full_filename));
+		printf(READING_PERMISSIONS_ERROR, full_filename);
 		return False;
 	}
 	
@@ -54,7 +54,7 @@ bool first_phase_process(char *full_filename)
 		if (strchr(temp_line, NEW_LINE) == NULL && !feof(file_des))
 		{
 			/* Print message and prevent further line processing, as well as second pass.  */
-			fprintf(ERR_OUTPUT_FILE, TOO_LONG_INPUT_LINE(full_filename, line_number, MAX_LINE_LENGTH));
+			fprintf(ERR_OUTPUT_FILE, TOO_LONG_INPUT_LINE, full_filename, line_number, MAX_LINE_LENGTH);
 			is_process_stable = False;
 			/* skip leftovers */
 			do 
@@ -88,7 +88,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	copy_line = (char *)malloc_with_check(strlen(line) + 1);
 	if(copy_line == NULL)
 	{
-		printf(MEMORY_ALLOC_ERROR_IN("first_phase.c -> fp_line_process() -> copy_line"));
+		printf(MEMORY_ALLOC_ERROR_IN, "first_phase.c -> fp_line_process() -> copy_line");
 		exit(MEMORY_ALLOC_ERROR_EC);
 	}
 	is_labeled = False;
@@ -109,7 +109,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 		token = strtok(NULL, TOKENS_DELIMITERS);
 		if( token == NULL ) 
 		{
-			printf(EMPTY_LABEL_LINE(filename, line_number, copy_line));
+			printf(EMPTY_LABEL_LINE, filename, line_number, copy_line);
 			free(copy_line);
 			return False;
 		}
@@ -118,10 +118,10 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	if(is_data_instruction(token))
 	{
 		attribute = token;
-		rest_of_str = strtok(NULL, NEW_LINE_STR);
+		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
 		if(rest_of_str == NULL)
 		{
-			printf(EMPTY_DATA_LINE(filename, line_number, copy_line));
+			printf(EMPTY_DATA_LINE, filename, line_number, copy_line);
 			free(copy_line);
 			return False;
 		}
@@ -129,7 +129,8 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 		if(*is_process_stable && (*is_process_stable = encode_data(attribute, rest_of_str)) && is_labeled)
 		{
 			int dc = get_dc();
-			if(!insert_label(current_label, attribute, dc / 16, dc % 16))
+			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
+			if(!insert_label(current_label, ".data", dc / 16, dc % 16))
 			{
 				free(copy_line);
 				return False;
@@ -139,14 +140,14 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	else if(is_linked_instruction(token))
 	{
 		attribute = token;
-		rest_of_str = strtok(NULL, NEW_LINE_STR);
+		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
 		if(rest_of_str == NULL)
 		{
-			printf(EMPTY_EXTERN_LINE(filename, line_number, copy_line));
+			printf(EMPTY_EXTERN_LINE, filename, line_number, copy_line);
 			free(copy_line);
 			return False;
 		}
-		if(*is_process_stable && strcmp(attribute, ".extern") == 0 )
+		if(*is_process_stable && strcmp(attribute, ".extern") == 0)
 		{
 			insert_label(rest_of_str, attribute, 0, 0);
 		}
@@ -154,10 +155,11 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	else if(is_action_exist(token))
 	{
 		attribute = ".code";
-		rest_of_str = strtok(NULL, NEW_LINE_STR);
-		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str)) && is_label)
+		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
+		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str)) && is_labeled)
 		{
 			int dc = get_dc();
+			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
 			if(!insert_label(current_label, attribute, dc / 16, dc % 16))
 			{
 				free(copy_line);
@@ -167,7 +169,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	}
 	else
 	{
-		printf(UNKOWN_INSTRUCTION(filename, line_number, copy_line));
+		printf(UNKOWN_INSTRUCTION, filename, line_number, token);
 		free(copy_line);
 		return False;
 	}

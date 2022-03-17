@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
             puts(""); */
 		/* Process each file */
 		succeeded = process_file(argv[i]);
-		printf(succeeded ? "Process completed successfully on compiling %s." : "Process FAILED on compiling %s!", getFileName(argv[i]));
+		printf(succeeded ? "Process completed successfully on compiling %s.\n" : "Process FAILED on compiling %s!\n", getFileName(argv[i]));
 	}
 	return NO_ERRORS_EC;
 }
@@ -49,8 +49,7 @@ static bool process_file(char *filename)
 
 
     /* Continue initializing phase and start first phase: update status if the process is succeed */
-    if (is_process_stable)
-        is_process_stable = first_phase_process(full_filename);
+    is_process_stable = first_phase_process(full_filename);
 	
 
     /* Second phase: update status if the process is succeed */
@@ -70,8 +69,6 @@ static bool process_file(char *filename)
 	storage_dispose();
     /* Full file name */
 	free(full_filename);
-
-	print_label_table();
 
 	/* Returns if the process is succeed */
 	return is_process_stable;

@@ -67,6 +67,7 @@ bool insert_macro(char *macro_name, char *new_line);
  */
 char *get_macro_code(char *macro_name);
 
+void print_macros_table();
 
 /**
  *  
@@ -196,8 +197,23 @@ typedef struct macro {
 	char *data;
 } macro;
 
+/* Represents macro object */
+typedef struct macro_node {
+	/* Name of macro */
+	char *name;
+	/* Macro's data */
+	char *data;
+	/* Next */
+	struct macro_node *next;
+} macro_node;
+
+typedef struct macros_list {
+	macro_node *head;
+	unsigned int size;
+} macros_list;
+
 /* Represents label object */
-typedef struct label {
+typedef struct label_node {
 	/* Name of label */
 	char *label_name;
 	/* Base */
@@ -206,13 +222,13 @@ typedef struct label {
 	int offset;
     /* Attributes */
 	char *attribute[2];
-} label;
+	/* Next */
+	struct label_node *next;
+} label_node;
 
 typedef struct labels_list {
-	label *labels_table;
-	unsigned int nLabels;
+	label_node *head;
 	unsigned int size;
-	unsigned int block_size;
 } labels_list;
 
 typedef struct action_element {

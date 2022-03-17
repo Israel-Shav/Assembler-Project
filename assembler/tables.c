@@ -85,14 +85,29 @@ bool is_action_exist(char *action_name)
  * 
  */
 
-static macro *macros_table;
+static macros_list *macrosList;
 
 /**
  * @brief 
  * @return if the process is succeed
  */
-bool init_macro_table()
+static bool init_macros_table();
+
+/**
+ * @brief 
+ * @return if label_name is macro
+ */
+static void macros_table_dispose_node(macro_node* node);
+static void macros_table_dispose();
+
+/**
+ * @brief 
+ * @return if the process is succeed
+ */
+bool init_macros_table()
 {
+    macrosList = (macros_list *)malloc(sizeof(macros_list));
+	macrosList->size = 0;
     return True;
 }
 
@@ -102,6 +117,70 @@ bool init_macro_table()
  */
 bool insert_macro(char *macro_name, char *new_line)
 {
+	macro_node* node;
+
+	if(macrosList == NULL && !init_macros_table())
+		return False;
+	node = macrosList->head;
+	if(node != NULL)
+	{
+		while(node->next != NULL)
+		{
+			if(strcmp(node->name ,macro_name) == 0)
+			{
+				node->data = (char *)realloc(node->data ,strlen(node->data) + strlen(new_line) + 1);
+				if (node->data == NULL) 
+				{
+					macros_table_dispose();
+					printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_macro(,,,) -> node->data");
+					exit(1);
+				}
+				strcat(node->name , new_line);
+				return True;
+			}
+			node = node->next;
+		}
+		if(strcmp(node->name ,macro_name) == 0)
+		{
+			node->data = (char *)realloc(node->data ,strlen(node->data) + strlen(new_line) + 1);
+			if (node->data == NULL) 
+			{
+				macros_table_dispose();
+				printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_macro(,,,) -> node->data");
+				exit(1);
+			}
+			strcat(node->data , new_line);
+			return True;
+		}
+		node = node->next = (macro_node *)malloc(sizeof(macro_node));
+	}
+	else
+	{
+		node = macrosList->head = (macro_node *)malloc(sizeof(macro_node));
+	}
+	if (node == NULL) 
+	{
+		macros_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_macro(,,,) -> node");
+		exit(1);
+	} 
+	node->name = (char *)malloc(strlen(macro_name) + 1);
+	if (node->name == NULL) 
+	{
+		macros_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_macro(,,,) -> node->name ");
+		exit(1);
+	}
+	strcpy(node->name , macro_name);
+	node->data = (char *)malloc(strlen(new_line) + 1);
+	if (node->data == NULL) 
+	{
+		macros_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_macro(,,,) -> node->data");
+		exit(1);
+	}
+	strcpy(node->data , new_line);
+	(macrosList->size)++;
     return True;
 }
 
@@ -112,7 +191,55 @@ bool insert_macro(char *macro_name, char *new_line)
 char *get_macro_code(char *macro_name)
 {
 	/* If not exist return NULL */
+	macro_node* node;
+
+	if(macrosList == NULL || macro_name == NULL)
+		return NULL;
+
+	node = macrosList->head;
+	while(node != NULL)
+	{
+		if(strcmp(node->name ,macro_name) == 0)
+		{
+			return node->data;
+		}
+		node = node->next;
+	}
     return NULL;
+}
+
+void print_macros_table()
+{
+	macro_node* node;
+	if(macrosList == NULL)
+		return;
+	
+	node = macrosList->head;
+	printf("Macro\tdata\t\t\n");
+	while(node != NULL)
+	{
+		printf("%s\t%s\t\t\n", node->name, node->data);
+		node = node->next;
+	}
+}
+
+static void macros_table_dispose_node(macro_node* node)
+{
+	if(node == NULL)
+		return;
+	macros_table_dispose_node(node->next);
+	free(node->name);
+	free(node->data);
+	free(node);
+}
+
+static void macros_table_dispose()
+{
+	if(macrosList != NULL)
+	{
+		macros_table_dispose_node(macrosList->head);
+		free(macrosList);
+	}
 }
 
 /**
@@ -139,6 +266,7 @@ static bool init_labels_table();
  * @brief 
  * @return if label_name is label
  */
+static void labels_table_dispose_node(label_node* node);
 static void labels_table_dispose();
 
 /**
@@ -148,19 +276,7 @@ static void labels_table_dispose();
 static bool init_labels_table()
 {
 	labelsList = (labels_list *)malloc(sizeof(labels_list));
-	if(labelsList == NULL)
-	{
-		printf(MEMORY_ALLOC_ERROR_IN("table.c -> init_labels_table() -> labelsList"));
-		exit(MEMORY_ALLOC_ERROR_EC);
-	}
-	labelsList->nLabels = 0;
-	labelsList->labels_table =  (label *)malloc(labelsList->block_size = labelsList->size = sizeof(label));
-	if(labelsList->labels_table == NULL)
-	{
-		free(labelsList);
-		printf(MEMORY_ALLOC_ERROR_IN("table.c -> init_labels_table() -> labels_table"));
-		exit(MEMORY_ALLOC_ERROR_EC);
-	}
+	labelsList->size = 0;
     return True;
 }
 
@@ -170,48 +286,51 @@ static bool init_labels_table()
  */
 bool insert_label(char *label_name, char *attribute, int base, int offset)
 {
-	unsigned int nLabels, newSize;
-	void* newLabels;
-
+	unsigned int size;
+	label_node* node;
+	
+	size = 1;
 	if(labelsList == NULL && !init_labels_table())
 		return False;
-	nLabels = labelsList->nLabels;
-    if (nLabels >= labelsList->size) {
-        newSize = labelsList->size + labelsList->block_size;
-        newLabels = realloc(labelsList->labels_table, newSize); 
-        if (newLabels == NULL) 
+	node = labelsList->head;
+	if(node == NULL)
+		node = labelsList->head = (label_node *)malloc(sizeof(label_node));
+	else
+	{
+		while(node->next != NULL)
 		{
-			labels_table_dispose();
-			printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label(,,,) -> newLabels"));
-            exit(1);
-        } 
-		else 
-		{    
-            labelsList->size = newSize;
-            labelsList->labels_table = (label*)newLabels;
-        }
-
-    }
-
-    labelsList->labels_table[nLabels].label_name = (char *)malloc_with_check(strlen(label_name) + 1);
-	if (labelsList->labels_table[nLabels].label_name == NULL) 
+			size++;
+			node = node->next;
+		}
+		node = node->next = (label_node *)malloc(sizeof(label_node));
+	}
+	if (node == NULL) 
 	{
 		labels_table_dispose();
-		printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label() -> label_name"));
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_label(,,,) -> node");
 		exit(1);
 	} 
-	strcpy(labelsList->labels_table[nLabels].label_name, label_name);
-	labelsList->labels_table[nLabels].base = base;
-	labelsList->labels_table[nLabels].offset = offset;
-	labelsList->labels_table[nLabels].attribute[0] = (char *)malloc_with_check(strlen(attribute) + 1);
-	if (labelsList->labels_table[nLabels].attribute[0] == NULL) 
+	node->label_name = (char *)malloc_with_check(strlen(label_name) + 1);
+	if (node->label_name == NULL) 
 	{
 		labels_table_dispose();
-		printf(MEMORY_ALLOC_ERROR_IN("table.c -> insert_label() -> attribute[0]"));
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_label() -> node->label_name");
 		exit(1);
 	} 
-	strcpy(labelsList->labels_table[nLabels].attribute[0], attribute);
-    ++labelsList->nLabels;
+	strcpy(node->label_name, label_name);
+	node->base = base;
+	node->offset = offset;
+	node->attribute[0] = (char *)malloc_with_check(strlen(attribute) + 1);
+	if (node->attribute[0] == NULL) 
+	{
+		labels_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_label() -> node->attribute[0]");
+		exit(1);
+	} 
+	strcpy(node->attribute[0], attribute);
+	node->attribute[1] = NULL;
+	node->next = NULL;
+	labelsList->size = size;
     return True;
 }
 
@@ -221,23 +340,25 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
  */
 bool add_entry_attribute(char *label_name)
 {
-	int i = 0;
-	for(i = 0; i < labelsList->nLabels; i++)
+	label_node* node;
+	node = labelsList->head;
+	while(node != NULL)
 	{
-		if(strcmp(label_name, labelsList->labels_table[i].label_name) == 0)
+		if(strcmp(label_name, node->label_name) == 0)
 		{
-			labelsList->labels_table[i].attribute[1] = (char *)malloc_with_check(strlen(".entry") + 1);
-			if (labelsList->labels_table[i].attribute[1] == NULL) 
+			node->attribute[1] = (char *)malloc_with_check(strlen(".entry") + 1);
+			if (node->attribute[1] == NULL) 
 			{
 				labels_table_dispose();
-				printf(MEMORY_ALLOC_ERROR_IN("table.c -> add_entry_attribute() -> attribute[1]"));
+				printf(MEMORY_ALLOC_ERROR_IN, "table.c -> add_entry_attribute() -> attribute[1]");
 				exit(1);
 			} 
-			strcpy(labelsList->labels_table[i].attribute[1], ".entry");
+			strcpy(node->attribute[1], ".entry");
 			return True;
 		}
+		node = node->next;
 	}
-	printf(LABEL_NOT_FOUND_ADD_ENTRY(*label_name));
+	printf(LABEL_NOT_FOUND_ADD_ENTRY, label_name);
     return False;
 }
 
@@ -281,18 +402,39 @@ bool is_label(char *label_name)
  * @brief 
  * @return if label_name is label
  */
+static void labels_table_dispose_node(label_node* node)
+{
+	if(node == NULL)
+		return;
+	labels_table_dispose_node(node->next);
+	free(node->label_name);
+	free(node->attribute[0]);
+	free(node->attribute[1]);
+	free(node);
+}
+
 static void labels_table_dispose()
 {
-	/* Labels section*/
-	int i;
-	for(i = 0; i < labelsList->nLabels; i++)
+	if(labelsList != NULL)
 	{
-		free(labelsList->labels_table[i].label_name);
-		free(labelsList->labels_table[i].attribute[0]);
-		free(labelsList->labels_table[i].attribute[1]);
+		labels_table_dispose_node(labelsList->head);
+		free(labelsList);
 	}
-    free(labelsList->labels_table);
-    free(labelsList);
+}
+
+void print_label_table()
+{
+	label_node* node;
+	if(labelsList == NULL)
+		return;
+	
+	node = labelsList->head;
+	printf("Label\tbase\toffset\tattributes #1, #2\t\t\n");
+	while(node != NULL)
+	{
+		printf("%s\t%d\t%d\t%s, %s\t\n", node->label_name, node->base, node->offset, node->attribute[0], node->attribute[1]);
+		node = node->next;
+	}
 }
 
 /**
@@ -302,17 +444,6 @@ static void labels_table_dispose()
 void tables_dispose()
 {
 	/* Labels section*/
+	macros_table_dispose();
     labels_table_dispose();
-}
-
-void print_label_table()
-{
-	int i;
-	printf("Label\tbase\toffset\tattributes #1, #2\t\t\n");
-	for(i = 0; i < labelsList->nLabels; i++)
-	{
-		printf("%s\t%d\t%d\t%s, %s\t\n", labelsList->labels_table[i].label_name, 
-				labelsList->labels_table[i].base, labelsList->labels_table[i].offset, 
-				labelsList->labels_table[i].attribute[0], labelsList->labels_table[i].attribute[1]);
-	}
 }

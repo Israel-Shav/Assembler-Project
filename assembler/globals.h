@@ -7,11 +7,17 @@
 
 #define TOKENS_DELIMITERS "\n\t\r "
 
+#define TOKENS_DELIMITERS_COLON "\n\t\r :"
+
+#define TOKENS_DELIMITERS_WO_SPACE "\n\t\r"
+
 #define COMMENT ';'
 
 #define NEW_LINE '\n'
 
 #define NEW_LINE_STR "\n"
+
+#define NEW_LINE_DELIMITERS "\r" NEW_LINE_STR
 
 #define READ_PERMISSIONS "r"
 

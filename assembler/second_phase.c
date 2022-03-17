@@ -40,7 +40,7 @@ bool second_phase_process(char *full_filename)
 	if (file_des == NULL) 
 	{
 		/* if file couldn't be opened, write to stderr. */
-		printf(READING_PERMISSIONS_ERROR(full_filename));
+		printf(READING_PERMISSIONS_ERROR, full_filename);
 		return False;
 	}
 	
@@ -51,7 +51,7 @@ bool second_phase_process(char *full_filename)
 		if (strchr(temp_line, NEW_LINE) == NULL && !feof(file_des))
 		{
 			/* Print message and prevent further line processing, as well as second pass.  */
-			fprintf(ERR_OUTPUT_FILE, TOO_LONG_INPUT_LINE(full_filename, line_number, MAX_LINE_LENGTH));
+			fprintf(ERR_OUTPUT_FILE, TOO_LONG_INPUT_LINE, full_filename, line_number, MAX_LINE_LENGTH);
 			is_process_stable = False;
 			/* skip leftovers */
 			do 
@@ -98,7 +98,7 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 		token = strtok(NULL, TOKENS_DELIMITERS);
 		if( token == NULL ) 
 		{
-			printf(EMPTY_LABEL_LINE(filename, line_number, copy_line));
+			printf(EMPTY_LABEL_LINE, filename, line_number, copy_line);
 			free(copy_line);
 			return False;
 		}
@@ -106,10 +106,10 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 
 	if(strcmp(token, ".entry") == 0)
 	{
-		rest_of_str = strtok(NULL, NEW_LINE_STR);
+		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
 		if(rest_of_str == NULL)
 		{
-			printf(EMPTY_EXTERN_LINE(filename, line_number, copy_line));
+			printf(EMPTY_EXTERN_LINE, filename, line_number, copy_line);
 			free(copy_line);
 			return False;
 		}
@@ -118,15 +118,9 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 	}
 	else if(is_action_exist(token))
 	{
-		rest_of_str = strtok(NULL, NEW_LINE_STR);
+		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
 		if(*is_process_stable)
 			*is_process_stable = second_encode_instruction(token, rest_of_str);
-	}
-	else
-	{
-		printf(UNKOWN_INSTRUCTION(filename, line_number, copy_line));
-		free(copy_line);
-		return False;
 	}
 	free(copy_line);
 	return True;
