@@ -27,6 +27,8 @@
 
 #define LABEL_NOT_FOUND_ADD_ENTRY "Error: \"%s\" not found in labels table.\n"
 
+#define LABEL_ALREADY_EXIST "Error in %s:%d: label \"%s\" is aready exist.\n"
+
 #define UNKNOWN_DATA_ATTRIBUTE "Error in %s:%d: \"%s\" is NOT .data and neither .string.\n"
 
 #define DATA_NOT_VALID "Error in %s:%d: \"%s\" is NOT valid data for .data instruction.\n"
@@ -36,6 +38,8 @@
 #define STRING_NOT_VALID "Error in %s:%d: %s is NOT valid string for .string instruction.\n"
 
 #define ACTION_NOT_EXIST "Error in %s:%d: %s is NOT a valid instruction.\n"
+
+
 
 
 /**

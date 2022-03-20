@@ -84,6 +84,8 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	
 	char *token, *current_label, *copy_line, *rest_of_str, *attribute;
 	bool is_labeled;
+	int dc;
+
 	current_label = NULL;
 	copy_line = (char *)malloc_with_check(strlen(line) + 1);
 	if(copy_line == NULL)
@@ -104,6 +106,12 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	
 	if((is_labeled = is_label(token)))
 	{
+		if(is_label_exist(token))
+		{
+			printf(LABEL_ALREADY_EXIST, filename, line_number, token);
+			free(copy_line);
+			return False;
+		}
 		current_label = token;
 		/* Get second token */
 		token = strtok(NULL, TOKENS_DELIMITERS);
@@ -126,11 +134,11 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 			return False;
 		}
 
+		dc = get_dc();
 		if(*is_process_stable && (*is_process_stable = encode_data(attribute, rest_of_str, filename, line_number)) && is_labeled)
 		{
-			int dc = get_dc();
 			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
-			if(!insert_label(current_label, ".data", dc / 16, dc % 16))
+			if(!insert_label(current_label, ".data", dc - (dc % 16), dc % 16))
 			{
 				free(copy_line);
 				return False;
@@ -147,7 +155,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 			free(copy_line);
 			return False;
 		}
-		if(*is_process_stable && strcmp(attribute, ".extern") == 0)
+		if(*is_process_stable && strcmp(attribute, ".extern") == 0 && !is_label_exist(rest_of_str))
 		{
 			insert_label(rest_of_str, attribute, 0, 0);
 		}
@@ -156,11 +164,11 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	{
 		attribute = ".code";
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
+		dc = get_dc();
 		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str, filename, line_number)) && is_labeled)
 		{
-			int dc = get_dc();
 			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
-			if(!insert_label(current_label, attribute, dc / 16, dc % 16))
+			if(!insert_label(current_label, attribute, dc - (dc % 16), dc % 16))
 			{
 				free(copy_line);
 				return False;

@@ -72,9 +72,30 @@ bool insert_label(char *label_name, char *attribute, int base, int offset);
 
 /**
  * @brief 
- * @return if the process is succeed
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
  */
 bool add_entry_attribute(char *label_name);
+
+/**
+ * @brief 
+ * 
+ * @param icf 
+ * @return true 
+ * @return false 
+ */
+bool after_first_phase_update(int icf);
+
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
+bool is_label_exist(char *label_name);
 
 /**
  * @brief 

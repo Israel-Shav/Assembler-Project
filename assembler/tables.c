@@ -245,7 +245,7 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
 {
 	unsigned int size;
 	label_node* node;
-	
+
 	size = 1;
 	if(labelsList == NULL && !init_labels_table())
 		return False;
@@ -293,7 +293,10 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
 
 /**
  * @brief 
- * @return if the process is succeed
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
  */
 bool add_entry_attribute(char *label_name)
 {
@@ -321,7 +324,53 @@ bool add_entry_attribute(char *label_name)
 
 /**
  * @brief 
- * @return if label_name is label
+ * 
+ * @param icf 
+ * @return true 
+ * @return false 
+ */
+bool after_first_phase_update(int icf)
+{
+	label_node* node;
+	int new_place;
+	node = labelsList->head;
+	while(node != NULL)
+	{
+		if(node->attribute[0] && strcmp(".data", node->attribute[0]) == 0)
+		{
+			new_place = node->base + node->offset + icf;
+			node->offset = new_place % 16;
+			node->base = new_place - node->offset;
+		}
+		node = node->next;
+	}
+    return True;
+}
+
+bool is_label_exist(char *label_name)
+{
+	label_node* node;
+
+	if(labelsList == NULL && !init_labels_table())
+		return False;
+	
+	node = labelsList->head;
+	while(node != NULL)
+	{
+		if(label_name && strcmp(label_name, node->label_name) == 0)
+			return True;
+		node = node->next;
+	}
+    return False;
+}
+
+
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
  */
 bool is_label(char *label_name)
 {

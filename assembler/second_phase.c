@@ -45,7 +45,7 @@ bool second_phase_process(char *full_filename)
 	}
 	
 	/* Read line - stop if read failed (when NULL returned) - usually when EOF. increase line counter for error printing. */
-	for (line_number = 1, is_process_stable = True; fgets(temp_line, MAX_LINE_LENGTH + 2, file_des) != NULL; line_number++) 
+	for (line_number = 1, is_process_stable = pre_second_phase_data_update(); fgets(temp_line, MAX_LINE_LENGTH + 2, file_des) != NULL; line_number++) 
 	{
 		/* if line too long, the buffer doesn't include the NEW_LINE='\n' char and the file isn't on end. */
 		if (strchr(temp_line, NEW_LINE) == NULL && !feof(file_des))

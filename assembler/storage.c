@@ -4,11 +4,22 @@
 #include <math.h>
 #include "globals.h"
 #include "storage.h"
+#include "tables.h"
 #include "errors.h"
 #include "utils.h"
 
+/**
+ * @brief 
+ * 
+ * @param decima 
+ * @param bit_size 
+ */
 static void print_bits(int decima, unsigned int bit_size);
 
+/**
+ * @brief 
+ * 
+ */
 static int DC, IC, DCF, ICF;
 
 /**
@@ -16,9 +27,12 @@ static int DC, IC, DCF, ICF;
  *         before output phase we resort "data" data
  * 
  */
-
 static machine_word *storage[MEMORY_CAPACITY];
 
+/**
+ * @brief 
+ * 
+ */
 static struct action_element op_fuct_table[] = {
 		{"mov", MOV_OP, NONE_FUNCT},
 		{"cmp",CMP_OP, NONE_FUNCT},
@@ -42,7 +56,10 @@ static struct action_element op_fuct_table[] = {
 
 /**
  * @brief 
- * @return if action exist
+ * 
+ * @param action_name 
+ * @return true 
+ * @return false 
  */
 bool is_action_exist(char *action_name)
 {
@@ -57,8 +74,10 @@ bool is_action_exist(char *action_name)
 }
 
 /**
- * @brief 
- * @return if action exist
+ * @brief Get the action object
+ * 
+ * @param action_name 
+ * @return action_element* 
  */
 action_element *get_action(char *action_name)
 {
@@ -74,7 +93,9 @@ action_element *get_action(char *action_name)
 
 /**
  * @brief 
- * @return if the process is stable
+ * 
+ * @return true 
+ * @return false 
  */
 bool init_storage()
 {
@@ -87,7 +108,13 @@ bool init_storage()
 
 /**
  * @brief 
- * @return if the process is stable
+ * 
+ * @param attribute 
+ * @param data 
+ * @param filename 
+ * @param line_number 
+ * @return true 
+ * @return false 
  */
 bool encode_data(char *attribute, char *data, char *filename, int line_number)
 {
@@ -210,26 +237,23 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
 
 /**
  * @brief 
- * @return if the process is stable
+ * 
+ * @param action 
+ * @param operands 
+ * @param filename 
+ * @param line_number 
+ * @return true 
+ * @return false 
  */
 bool first_encode_instruction(char *action, char *operands, char *filename, int line_number)
 {
     action_element *action_e;
-    if ((action_e = get_action(action)) == NULL)
+    if ((action_e = get_action(action)) == NULL || action_e->action == NULL)
     {
         printf(ACTION_NOT_EXIST, filename, line_number, action);
         return False;
     }
-    printf("%s in line %d\n", action, line_number);
-    return True;
-}
-
-/**
- * @brief 
- * @return if the process is stable
- */
-bool second_encode_instruction(char *action, char *operands, char *filename, int line_number)
-{
+    printf("%s in line %d\n", operands, line_number);
     return True;
 }
 
@@ -239,12 +263,31 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
  */
 bool pre_second_phase_data_update()
 {
-    return True;
+    ICF = IC;
+    DCF = DC;
+    return after_first_phase_update(ICF);
 }
 
 /**
  * @brief 
- * @return DC value
+ * 
+ * @param action 
+ * @param operands 
+ * @param filename 
+ * @param line_number 
+ * @return true 
+ * @return false 
+ */
+bool second_encode_instruction(char *action, char *operands, char *filename, int line_number)
+{
+    
+    return True;
+}
+
+/**
+ * @brief Get the dc object
+ * 
+ * @return int 
  */
 int get_dc()
 {
@@ -254,6 +297,7 @@ int get_dc()
 
 /**
  * @brief 
+ * 
  */
 void storage_dispose()
 {
@@ -273,6 +317,10 @@ void storage_dispose()
     ICF = DCF = DEFAULT_IC_DC_FINAL;
 }
 
+/**
+ * @brief 
+ * 
+ */
 void print_storage_table()
 {
     int i;
@@ -298,7 +346,12 @@ void print_storage_table()
 	}
 }
 
-
+/**
+ * @brief 
+ * 
+ * @param decimal 
+ * @param bit_size 
+ */
 static void print_bits(int decimal, unsigned int bit_size)
 {
     int length, counter, *binary;
