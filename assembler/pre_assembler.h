@@ -4,6 +4,8 @@
 
 #define SOURCE_FILE_EXTENSION ".as"
 
+#define DEST_FILE_EXTENSION ".am"
+
 #define AFTER_MACRO_DIR "./after_macro"
 
 #define MACRO_START_STATEMENT "macro"

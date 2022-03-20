@@ -126,7 +126,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 			return False;
 		}
 
-		if(*is_process_stable && (*is_process_stable = encode_data(attribute, rest_of_str)) && is_labeled)
+		if(*is_process_stable && (*is_process_stable = encode_data(attribute, rest_of_str, filename, line_number)) && is_labeled)
 		{
 			int dc = get_dc();
 			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
@@ -169,7 +169,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	}
 	else
 	{
-		printf(UNKOWN_INSTRUCTION, filename, line_number, token);
+		printf(UNKNOWN_INSTRUCTION, filename, line_number, token);
 		free(copy_line);
 		return False;
 	}

@@ -61,6 +61,8 @@ static bool process_file(char *filename)
         build_output_files(filename);*/
 
 	print_label_table();
+	
+	print_storage_table();
 
     /* Garbage collector: */
 	/* Free all tables */

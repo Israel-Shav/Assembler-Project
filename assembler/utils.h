@@ -34,6 +34,13 @@ char *strallocat(char *s0, char* s1);
 char *getFileName(char *path);
 
 /**
+ * Creates
+ * @param 
+ * @return 
+ */
+bool is_integer(char *str);
+
+/**
  * @brief Enums:
  */
 

@@ -9,7 +9,7 @@
 
 #define NO_ERRORS_EC 0
 
-#define MEMORY_ALLOC_ERROR_IN "Error: Fatal - Memory allocation failed in %s.\n"
+#define MEMORY_ALLOC_ERROR_IN "Error: Fatal - Memory allocation failed in \"%s\".\n"
 #define MEMORY_ALLOC_ERROR "Error: Fatal - Memory allocation failed.\n"
 #define MEMORY_ALLOC_ERROR_EC 1
 
@@ -23,9 +23,17 @@
 
 #define EMPTY_EXTERN_LINE "Error in %s:%d: Empty .extern declaration.\n\tIn line: \"%s\"\n"
 
-#define UNKOWN_INSTRUCTION "Error in %s:%d: Unkown istructions.\n* instruction: \"%s\"\n"
+#define UNKNOWN_INSTRUCTION "Error in %s:%d: UNKNOWN istructions.\n* instruction: \"%s\"\n"
 
-#define LABEL_NOT_FOUND_ADD_ENTRY "Error: %s not found in labels table.\n"
+#define LABEL_NOT_FOUND_ADD_ENTRY "Error: \"%s\" not found in labels table.\n"
+
+#define UNKNOWN_DATA_ATTRIBUTE "Error in %s:%d: \"%s\" is NOT .data and neither .string.\n"
+
+#define DATA_NOT_VALID "Error in %s:%d: \"%s\" is NOT valid data for .data instruction.\n"
+
+#define DATA_NOT_VALID_COMMA "Error in %s:%d: \"%s\" is NOT valid data there is empty value between two commas.\n"
+
+#define STRING_NOT_VALID "Error in %s:%d: %s is NOT valid string for .string instruction.\n"
 
 /**
  * @brief Prototypes:

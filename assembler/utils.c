@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include "globals.h"
 #include "utils.h"
 #include "errors.h"
 
@@ -49,4 +51,24 @@ char *getFileName(char *path) {
     }
     return retVal;
 }
+
+/**
+ * Creates
+ * @param 
+ * @return 
+ */
+bool is_integer(char *str) 
+{
+	int i = 0;
+	/* str starts with plus or minus, it's fine*/
+	if (str[0] == '-' || str[0] == '+') str++; 
+	while (str[i]) 
+	{ 
+		if (!isdigit(str[i])) 
+			return False;
+		i++;
+	}
+	return i > 0; /* if i==0 then it was an empty string! */
+}
+
 

@@ -2,6 +2,16 @@
  * @brief Constants:
  */
 
+#define MEMORY_CAPACITY 8192
+
+#define MAX_DATA_WORD_SIZE 16
+
+#define DEFAULT_DC 0
+
+#define DEFAULT_IC 100
+
+#define DEFAULT_IC_DC_FINAL -1
+
 /**
  * @brief Prototypes:
  */
@@ -12,11 +22,12 @@
  */
 bool init_storage();
 
+
 /**
  * @brief 
  * @return if the process is succeed
  */
-bool encode_data(char *attribute, char *data);
+bool encode_data(char *attribute, char *data, char *filename, int line_number);
 
 /**
  * @brief 
@@ -46,6 +57,9 @@ int get_dc();
  */
 void storage_dispose();
 
+
+void print_storage_table();
+
 /**
  * @brief Enums:
  */
@@ -70,7 +84,7 @@ typedef struct code_word {
 
 /* Represents a single data word. */
 typedef struct data_word {
-	unsigned int data: 16;
+ 	int data: 16;
 	unsigned int ERA: 3;
     unsigned int END: 1;
 } data_word;

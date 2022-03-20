@@ -37,7 +37,9 @@ char *macro_phase_process(char *filename)
 
     /* Duplicate as file */
     full_filename = strallocat(filename, SOURCE_FILE_EXTENSION);
-	macro_full_filename = strallocat(AFTER_MACRO_DIR, getFileName(full_filename));
+	macro_name = strallocat(filename, DEST_FILE_EXTENSION);
+	macro_full_filename = strallocat(AFTER_MACRO_DIR, getFileName(macro_name));
+	free(macro_name);
 
     /* Open file, skip on failure, current assembly file descriptor to process */
 	file_des = fopen(full_filename, READ_PERMISSIONS);
@@ -133,9 +135,9 @@ static char *macro_line_process(char *line, bool *is_process_stable, char *macro
 				return macro_name;
 			}
 			else if((macro_data = get_macro_code(token)) != NULL)
-				fprintf(new_file, macro_data);
+				fprintf(new_file, "%s", macro_data);
 			else
-				fprintf(new_file, copy_line);
+				fprintf(new_file, "%s", copy_line);
 		}
    }
    free(copy_line);
