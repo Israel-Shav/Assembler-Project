@@ -156,7 +156,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	{
 		attribute = ".code";
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
-		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str)) && is_labeled)
+		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str, filename, line_number)) && is_labeled)
 		{
 			int dc = get_dc();
 			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);

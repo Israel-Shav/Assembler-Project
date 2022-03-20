@@ -50,6 +50,9 @@ static bool process_file(char *filename)
 
     /* Continue initializing phase and start first phase: update status if the process is succeed */
     is_process_stable = first_phase_process(full_filename);
+
+	if (is_process_stable)
+        is_process_stable = pre_second_phase_data_update();
 	
 
     /* Second phase: update status if the process is succeed */
@@ -57,12 +60,8 @@ static bool process_file(char *filename)
         is_process_stable = second_phase_process(full_filename);
 
     /* Output phase: creates output files if process is stable */
-    /*if (is_process_stable)
-        build_output_files(filename);*/
-
-	print_label_table();
-	
-	print_storage_table();
+    if (is_process_stable)
+        build_output_files(filename);
 
     /* Garbage collector: */
 	/* Free all tables */

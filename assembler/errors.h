@@ -35,6 +35,9 @@
 
 #define STRING_NOT_VALID "Error in %s:%d: %s is NOT valid string for .string instruction.\n"
 
+#define ACTION_NOT_EXIST "Error in %s:%d: %s is NOT a valid instruction.\n"
+
+
 /**
  * @brief Prototypes:
  */

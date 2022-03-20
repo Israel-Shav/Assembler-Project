@@ -29,18 +29,6 @@ bool is_data_instruction(char *instruction_word);
  */
 bool is_linked_instruction(char *instruction_word);
 
-/**
- *  
- * 
- *  @brief Actions table section:
- * 
- */
-
-/**
- * @brief 
- * @return if action exist
- */
-bool is_action_exist(char *action_name);
 
 /**
  *  

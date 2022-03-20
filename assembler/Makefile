@@ -13,7 +13,7 @@ assembler: $(OBJS)
 
 # Objects
 objects/%.o: %.c %.h $(HDRS)
-	@mkdir -p ./objects ./after_macro
+	@mkdir -p ./objects ./after_macro ./output
 	$(CC) $(CFLAGS) -c $< -o $@ $(LFLAGS)
 
 # Clean section

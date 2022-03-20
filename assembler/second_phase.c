@@ -120,7 +120,7 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 	{
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
 		if(*is_process_stable)
-			*is_process_stable = second_encode_instruction(token, rest_of_str);
+			*is_process_stable = second_encode_instruction(token, rest_of_str, filename, line_number);
 	}
 	free(copy_line);
 	return True;

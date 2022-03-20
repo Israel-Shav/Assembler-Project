@@ -16,6 +16,19 @@
  * @brief Prototypes:
  */
 
+
+/**
+ * @brief 
+ * @return if action exist
+ */
+bool is_action_exist(char *action_name);
+
+/**
+ * @brief 
+ * @return if action exist
+ */
+action_element *get_action(char *action_name);
+
 /**
  * @brief 
  * @return if the process is succeed
@@ -33,12 +46,12 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number);
  * @brief 
  * @return if the process is succeed
  */
-bool first_encode_instruction(char *action, char *operands);
+bool first_encode_instruction(char *action, char *operands, char *filename, int line_number);
 /**
  * @brief 
  * @return if the process is succeed
  */
-bool second_encode_instruction(char *action, char *operands);
+bool second_encode_instruction(char *action, char *operands, char *filename, int line_number);
 
 /**
  * @brief 

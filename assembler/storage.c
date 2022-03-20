@@ -7,6 +7,8 @@
 #include "errors.h"
 #include "utils.h"
 
+static void print_bits(int decima, unsigned int bit_size);
+
 static int DC, IC, DCF, ICF;
 
 /**
@@ -37,6 +39,39 @@ static struct action_element op_fuct_table[] = {
 		{NULL, NONE_OP, NONE_FUNCT}
 };
 
+
+/**
+ * @brief 
+ * @return if action exist
+ */
+bool is_action_exist(char *action_name)
+{
+	int i;
+
+	if(action_name == NULL)
+		return False;
+	for(i = 0; i < sizeof(op_fuct_table) / sizeof(action_element); i++)
+		if(op_fuct_table != NULL && op_fuct_table[i].action != NULL && strcmp(op_fuct_table[i].action, action_name) == 0)
+			return True;
+    return False;
+}
+
+/**
+ * @brief 
+ * @return if action exist
+ */
+action_element *get_action(char *action_name)
+{
+	int i;
+
+	if(action_name == NULL)
+		return False;
+	for(i = 0; i < (sizeof(op_fuct_table) / sizeof(action_element)) - 1; i++)
+		if(op_fuct_table != NULL && op_fuct_table[i].action != NULL && strcmp(op_fuct_table[i].action, action_name) == 0)
+			return op_fuct_table + i;
+    return op_fuct_table + i;
+}
+
 /**
  * @brief 
  * @return if the process is stable
@@ -62,8 +97,7 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
         data_word *dataWord;
         int index;
         bool in_quotes, found;
-        for (index = 0, found = in_quotes = False; data[index] != STRING_END  && data[index] != EOF &&
-         data[index] != NEW_LINE && data[index] != TAB; index++)
+        for (index = 0, found = in_quotes = False; data[index] != STRING_END  && data[index] != EOF && data[index] != NEW_LINE; index++)
         {
             if(!in_quotes)
                 SKIP_WHITE_CHARS(data, index)
@@ -100,6 +134,13 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
             if(!in_quotes)
                 SKIP_WHITE_CHARS(data, index)
         }
+        dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+        storage[MEMORY_CAPACITY - 1 - DC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[MEMORY_CAPACITY - 1 - DC]->word).data = dataWord;
+        dataWord->data = STRING_END;
+        dataWord->ERA = 4;
+        dataWord->END = 0;
+        DC++;
         return True;
     }
     else if (strcmp(attribute, ".data") == 0)
@@ -171,8 +212,15 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
  * @brief 
  * @return if the process is stable
  */
-bool first_encode_instruction(char *action, char *operands)
+bool first_encode_instruction(char *action, char *operands, char *filename, int line_number)
 {
+    action_element *action_e;
+    if ((action_e = get_action(action)) == NULL)
+    {
+        printf(ACTION_NOT_EXIST, filename, line_number, action);
+        return False;
+    }
+    printf("%s in line %d\n", action, line_number);
     return True;
 }
 
@@ -180,7 +228,7 @@ bool first_encode_instruction(char *action, char *operands)
  * @brief 
  * @return if the process is stable
  */
-bool second_encode_instruction(char *action, char *operands)
+bool second_encode_instruction(char *action, char *operands, char *filename, int line_number)
 {
     return True;
 }
@@ -203,15 +251,27 @@ int get_dc()
     return DC;
 }
 
+
 /**
  * @brief 
  */
 void storage_dispose()
 {
-    
+    int i;
+	for(i = DEFAULT_IC; i < IC; i++)
+	{
+        free((storage[i]->word).opcode);
+        free(storage[i]);
+	}
+    IC = DEFAULT_IC;
+    for(i = (MEMORY_CAPACITY - DC); i < MEMORY_CAPACITY; i++)
+	{
+        free((storage[i]->word).data);
+        free(storage[i]);
+	}
+    DC = DEFAULT_DC;
+    ICF = DCF = DEFAULT_IC_DC_FINAL;
 }
-
-static void print_bits(int decima, unsigned int bit_size);
 
 void print_storage_table()
 {
@@ -237,6 +297,7 @@ void print_storage_table()
         printf(" \n");
 	}
 }
+
 
 static void print_bits(int decimal, unsigned int bit_size)
 {
