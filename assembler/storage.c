@@ -20,7 +20,7 @@ static void print_bits(int decima, unsigned int bit_size);
  * @brief 
  * 
  */
-static int DC, IC, DCF, ICF;
+static int DC, IC, DCF, ICF, IC_COUNTER;
 
 /**
  * @brief "instructions" data from top to bottom and "data" data from bottom to top
@@ -34,23 +34,23 @@ static machine_word *storage[MEMORY_CAPACITY];
  * 
  */
 static struct action_element op_fuct_table[] = {
-		{"mov", MOV_OP, NONE_FUNCT},
-		{"cmp",CMP_OP, NONE_FUNCT},
-		{"add",ADD_OP, ADD_FUNCT},
-		{"sub",SUB_OP, SUB_FUNCT},
-		{"lea",LEA_OP, NONE_FUNCT},
-		{"clr",CLR_OP, CLR_FUNCT},
-		{"not",NOT_OP, NOT_FUNCT},
-		{"inc",INC_OP, INC_FUNCT},
-		{"dec",DEC_OP, DEC_FUNCT},
-		{"jmp",JMP_OP, JMP_FUNCT},
-		{"bne",BNE_OP, BNE_FUNCT},
-		{"jsr",JSR_OP, JSR_FUNCT},
-		{"red",RED_OP, NONE_FUNCT},
-		{"prn",PRN_OP, NONE_FUNCT},
-		{"rts",RTS_OP, NONE_FUNCT},
-		{"stop",STOP_OP, NONE_FUNCT},
-		{NULL, NONE_OP, NONE_FUNCT}
+		{"mov", MOV_OP, NONE_FUNCT, 2},
+		{"cmp",CMP_OP, NONE_FUNCT, 2},
+		{"add",ADD_OP, ADD_FUNCT, 2},
+		{"sub",SUB_OP, SUB_FUNCT, 2},
+		{"lea",LEA_OP, NONE_FUNCT, 2},
+		{"clr",CLR_OP, CLR_FUNCT, 1},
+		{"not",NOT_OP, NOT_FUNCT, 1},
+		{"inc",INC_OP, INC_FUNCT, 1},
+		{"dec",DEC_OP, DEC_FUNCT, 1},
+		{"jmp",JMP_OP, JMP_FUNCT, 1},
+		{"bne",BNE_OP, BNE_FUNCT, 1},
+		{"jsr",JSR_OP, JSR_FUNCT, 1},
+		{"red",RED_OP, NONE_FUNCT, 1},
+		{"prn",PRN_OP, NONE_FUNCT, 1},
+		{"rts",RTS_OP, NONE_FUNCT, 0},
+		{"stop",STOP_OP, NONE_FUNCT, 0},
+		{NULL, NONE_OP, NONE_FUNCT, 0}
 };
 
 
@@ -100,7 +100,7 @@ action_element *get_action(char *action_name)
 bool init_storage()
 {
     DC = DEFAULT_DC;
-    IC = DEFAULT_IC;
+    IC_COUNTER = IC = DEFAULT_IC;
     ICF = DCF = DEFAULT_IC_DC_FINAL;
 
     return True;
@@ -265,8 +265,39 @@ bool pre_second_phase_data_update()
 {
     ICF = IC;
     DCF = DC;
+    IC_COUNTER = 0;
     return after_first_phase_update(ICF);
 }
+
+/**
+ * @brief 
+ * 
+ * @param word_name 
+ */
+static void second_phase_word_update(char *word_name);
+
+
+/**
+ * @brief 
+ * 
+ * @param word_name 
+ */
+static void second_phase_word_update(char *word_name)
+{
+    label_node *node;
+    if((node = get_label(word_name)) != NULL)
+    {
+        /* Update first word in storage in place IC_COUNTER */
+        if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
+            storage[IC_COUNTER]->word.data->data = node->base;
+        IC_COUNTER++;
+        /* Update second word in storage in place IC_COUNTER */
+        if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
+            storage[IC_COUNTER]->word.data->data = node->offset;
+        IC_COUNTER++;
+    }
+}
+
 
 /**
  * @brief 
@@ -280,7 +311,54 @@ bool pre_second_phase_data_update()
  */
 bool second_encode_instruction(char *action, char *operands, char *filename, int line_number)
 {
-    
+    action_element *action_e;
+    char *token, *temp_str;
+
+    if ((action_e = get_action(action)) == NULL || action_e->action == NULL)
+    {
+        printf(ACTION_NOT_EXIST, filename, line_number, action);
+        return False;
+    }
+
+    temp_str = (char *)malloc_with_check(sizeof(operands)+1);
+    token = strtok(temp_str, TOKENS_DELIMITERS_COMMA);
+    if(action_e->opCount == 0)
+        IC_COUNTER++;
+    else if(operands && token != NULL)
+    {
+        if(action_e->opCount == 1)
+        {
+            IC_COUNTER += 2;
+            second_phase_word_update(token);
+        }
+        else if(action_e->opCount == 2)
+        {
+            IC_COUNTER += 2;
+            second_phase_word_update(token);
+            token = strtok(NULL, TOKENS_DELIMITERS_COMMA);
+            if(token != NULL)
+                second_phase_word_update(token);
+            else 
+            {
+                printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+                free(temp_str);
+                return False;
+            }
+        }
+        else
+        {
+            printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+            free(temp_str);
+            return False;
+        }
+
+    }
+    else
+    {
+        printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+        free(temp_str);
+        return False;
+    }
     return True;
 }
 

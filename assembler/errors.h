@@ -39,6 +39,8 @@
 
 #define ACTION_NOT_EXIST "Error in %s:%d: %s is NOT a valid instruction.\n"
 
+#define OPERANDS_NOT_VALID "Error in %s:%d: operands are not valid, operands: %s\n"
+
 
 
 

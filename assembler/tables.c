@@ -364,6 +364,23 @@ bool is_label_exist(char *label_name)
     return False;
 }
 
+label_node *get_label(char *label_name)
+{
+	label_node* node;
+
+	if(labelsList == NULL || label_name == NULL)
+		return NULL;
+	
+	node = labelsList->head;
+	while(node != NULL)
+	{
+		if(label_name && strcmp(label_name, node->label_name) == 0)
+			return node;
+		node = node->next;
+	}
+    return NULL;
+}
+
 
 /**
  * @brief 

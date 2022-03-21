@@ -33,6 +33,8 @@
 
 #define WRITE_PERMISSIONS "w"
 
+#define TOKENS_DELIMITERS_COMMA "\n\t\r ,"
+
 /**
  * @brief Prototypes:
  */
@@ -130,4 +132,6 @@ typedef struct action_element {
 	opcode op;
     /* Action's funct */
 	funct fun;
+	/* Operands count */
+	int opCount;
 } action_element;
