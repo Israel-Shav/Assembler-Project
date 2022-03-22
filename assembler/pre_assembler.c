@@ -46,7 +46,7 @@ char *macro_phase_process(char *filename)
 	if (file_des == NULL) 
 	{
 		/* if file couldn't be opened, write to stderr. */
-		printf(READING_PERMISSIONS_ERROR, full_filename);
+		printf(READING_PERMISSIONS_ERROR, filename);
 		free(full_filename);
 		free(macro_full_filename);
 		return NULL;
@@ -57,7 +57,7 @@ char *macro_phase_process(char *filename)
 	if (macro_file_des == NULL) 
 	{
 		/* if file couldn't be opened, write to stderr. */
-		printf(READING_PERMISSIONS_ERROR, macro_full_filename);
+		printf(WRITING_PERMISSIONS_ERROR, macro_full_filename);
 		free(full_filename);
 		free(macro_full_filename);
 		fclose(file_des);

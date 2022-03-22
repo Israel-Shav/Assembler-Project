@@ -66,6 +66,13 @@ bool pre_second_phase_data_update();
 int get_dc();
 
 /**
+ * @brief Create a object file object
+ * 
+ * @param new_filename 
+ */
+void create_object_file(char *new_filename);
+
+/**
  * @brief 
  */
 void storage_dispose();
@@ -102,6 +109,15 @@ typedef struct data_word {
     unsigned int END: 1;
 } data_word;
 
+/* Represents a single object word. */
+typedef struct object_word {
+	unsigned int E: 4;
+	unsigned int D: 4;
+ 	unsigned int C: 4;
+	unsigned int B: 4;
+    unsigned int A: 4;
+} object_word;
+
 /* Represents a general machine code word contents */
 typedef struct machine_word {
 	/* if it represents code (not additional data), this field contains the total length required by the code. if it's data, this field is 0. */
@@ -111,5 +127,6 @@ typedef struct machine_word {
         opcode_word *opcode;
 		data_word   *data;
 		code_word   *code;
+		object_word	*object;
 	} word;
 } machine_word;

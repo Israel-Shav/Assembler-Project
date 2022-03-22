@@ -15,6 +15,8 @@
 
 #define READING_PERMISSIONS_ERROR "Error: file \"%s.as\" is inaccessible for reading. skipping it.\n"
 
+#define WRITING_PERMISSIONS_ERROR "Error: file \"%s\" is inaccessible for writing. skipping it.\n"
+
 #define TOO_LONG_INPUT_LINE "Error in %s:%d: Line too long to process. Maximum line length should be %d.\n"
 
 #define EMPTY_LABEL_LINE "Error in %s:%d: Empty label declaration.\n\tIn line: \"%s\"\n"

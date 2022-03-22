@@ -298,6 +298,26 @@ static void second_phase_word_update(char *word_name)
     }
 }
 
+/**
+ * @brief 
+ * 
+ * @param word_name 
+ * @param ic_counter 
+ */
+static void external_label_manager(char *word_name, int ic_counter);
+
+/**
+ * @brief 
+ * 
+ * @param word_name 
+ * @param ic_counter 
+ */
+static void external_label_manager(char *word_name, int ic_counter)
+{
+    int offset;
+    offset = ic_counter % 16;
+    insert_external_label(word_name, ic_counter - offset, offset);
+}
 
 /**
  * @brief 
@@ -320,8 +340,12 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
         return False;
     }
 
-    temp_str = (char *)malloc_with_check(sizeof(operands)+1);
-    token = strtok(temp_str, TOKENS_DELIMITERS_COMMA);
+    if(action_e->opCount > 0)
+    {
+        temp_str = (char *)malloc_with_check(sizeof(operands)+1);
+        strcpy(temp_str, operands);
+        token = strtok(temp_str, TOKENS_DELIMITERS_COMMA);
+    }
     if(action_e->opCount == 0)
         IC_COUNTER++;
     else if(operands && token != NULL)
@@ -330,14 +354,19 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
+            external_label_manager(token, IC_COUNTER + DEFAULT_IC);
         }
         else if(action_e->opCount == 2)
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
+            external_label_manager(token, IC_COUNTER + DEFAULT_IC);
             token = strtok(NULL, TOKENS_DELIMITERS_COMMA);
             if(token != NULL)
+            {
                 second_phase_word_update(token);
+                external_label_manager(token, IC_COUNTER + DEFAULT_IC);
+            }
             else 
             {
                 printf(OPERANDS_NOT_VALID, filename, line_number, operands);
@@ -370,6 +399,40 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
 int get_dc()
 {
     return DC;
+}
+
+/**
+ * @brief Create a object file object
+ * 
+ * @param new_filename 
+ */
+void create_object_file(char *new_filename)
+{
+    int ic_counter, dc_counter;
+    FILE *object_file;
+    object_word *object;
+
+    /* Open file, skip on failure, current assembly file descriptor to process */
+	object_file = fopen(new_filename, WRITE_PERMISSIONS);
+	if (object_file == NULL) 
+	{
+		/* if file couldn't be opened, write to stderr. */
+		printf(WRITING_PERMISSIONS_ERROR, new_filename);
+		return;
+	}
+    fprintf(object_file, "%d %d\n", ICF - DEFAULT_IC, DCF);
+    for (ic_counter = DEFAULT_IC; ic_counter < ICF; ic_counter++)
+    {
+        object = storage[ic_counter]->word.object;
+        fprintf(object_file, "%.4d A%x-B%x-C%x-D%x-E%x%s", ic_counter , object->A, object->B, object->C, object->D, object->E, NEW_LINE_STR);
+    }
+
+    for(dc_counter = MEMORY_CAPACITY - 1 ; dc_counter >= MEMORY_CAPACITY - DCF; dc_counter--)
+	{
+        object = storage[dc_counter]->word.object;
+        fprintf(object_file, "%.4d A%x-B%x-C%x-D%x-E%x%s", ic_counter + (MEMORY_CAPACITY - 1 - dc_counter)  , object->A, object->B, object->C, object->D, object->E, NEW_LINE_STR);
+	}
+	fclose(object_file);
 }
 
 

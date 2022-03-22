@@ -206,12 +206,21 @@ static void macros_table_dispose()
  * 
  */
 
-static labels_list *labelsList;
+static labels_list *labelsList, *externalLabelsList;
 
 /**
  * @brief Static declartions: should be only in same file otherwise it will be copied
  * 
  */
+
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
+static bool is_label_external(char *label_name);
 
 /**
  * @brief 
@@ -234,6 +243,7 @@ static bool init_labels_table()
 {
 	labelsList = (labels_list *)malloc(sizeof(labels_list));
 	labelsList->size = 0;
+	labelsList->head = NULL;
     return True;
 }
 
@@ -293,6 +303,79 @@ bool insert_label(char *label_name, char *attribute, int base, int offset)
 
 /**
  * @brief 
+ * @return if the process is succeed
+ */
+static bool init_external_labels_table();
+
+/**
+ * @brief 
+ * @return if label_name is label
+ */
+static void external_labels_table_dispose_node(label_node* node);
+
+/**
+ * @brief 
+ * @return if the process is succeed
+ */
+static bool init_external_labels_table()
+{
+	externalLabelsList = (labels_list *)malloc(sizeof(labels_list));
+	externalLabelsList->size = 0;
+	externalLabelsList->head = NULL;
+    return True;
+}
+
+/**
+ * @brief 
+ * @return if the process is succeed
+ */
+void insert_external_label(char *label_name, int base, int offset)
+{
+	unsigned int size;
+	label_node* node;
+
+	if(!is_label_external(label_name))
+		return;
+
+	size = 1;
+	if(externalLabelsList == NULL && !init_external_labels_table())
+		return;
+	node = externalLabelsList->head;
+	if(node == NULL)
+		node = externalLabelsList->head = (label_node *)malloc(sizeof(label_node));
+	else
+	{
+		while(node->next != NULL)
+		{
+			size++;
+			node = node->next;
+		}
+		node = node->next = (label_node *)malloc(sizeof(label_node));
+	}
+	if (node == NULL) 
+	{
+		labels_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_external_label(,,,) -> node");
+		exit(1);
+	} 
+	node->label_name = (char *)malloc_with_check(strlen(label_name) + 1);
+	if (node->label_name == NULL) 
+	{
+		labels_table_dispose();
+		printf(MEMORY_ALLOC_ERROR_IN, "table.c -> insert_external_label() -> node->label_name");
+		exit(1);
+	} 
+	strcpy(node->label_name, label_name);
+	node->base = base;
+	node->offset = offset;
+	node->attribute[0] = NULL;
+	node->attribute[1] = NULL;
+	node->next = NULL;
+	externalLabelsList->size = size;
+}
+
+/**
+ * @brief 
  * 
  * @param label_name 
  * @return true 
@@ -347,6 +430,13 @@ bool after_first_phase_update(int icf)
     return True;
 }
 
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
 bool is_label_exist(char *label_name)
 {
 	label_node* node;
@@ -364,6 +454,36 @@ bool is_label_exist(char *label_name)
     return False;
 }
 
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
+static bool is_label_external(char *label_name)
+{
+	label_node* node;
+
+	if(labelsList == NULL)
+		return False;
+	
+	node = labelsList->head;
+	while(node != NULL)
+	{
+		if(label_name && strcmp(label_name, node->label_name) == 0 && node->attribute[0] != NULL && strcmp(".extern", node->attribute[0]) == 0)
+			return True;
+		node = node->next;
+	}
+    return False;
+}
+
+/**
+ * @brief Get the label object
+ * 
+ * @param label_name 
+ * @return label_node* 
+ */
 label_node *get_label(char *label_name)
 {
 	label_node* node;
@@ -421,6 +541,91 @@ bool is_label(char *label_name)
 	return False; /* There was no error */
 }
 
+
+void print_label_table()
+{
+	label_node* node;
+	if(labelsList == NULL)
+		return;
+	
+	node = labelsList->head;
+	printf("Label\tbase\toffset\tattributes #1, #2\t\t\n");
+	while(node != NULL)
+	{
+		printf("%s\t%d\t%d\t%s, %s\t\n", node->label_name, node->base, node->offset, node->attribute[0], node->attribute[1]);
+		node = node->next;
+	}
+}
+
+/**
+ * @brief Create a entries file object
+ * 
+ * @param new_filename 
+ */
+void create_entries_file(char *new_filename)
+{
+	label_node* node;
+	FILE *entries_file;
+	if(labelsList == NULL)
+		return;
+	
+	entries_file = NULL;
+	node = labelsList->head;
+	while(node != NULL)
+	{
+
+		if(node->attribute[1] != NULL && strcmp(".entry", node->attribute[1]) == 0)
+		{
+			/* Open file, skip on failure, current assembly file descriptor to process */
+			if(entries_file == NULL)
+			{
+				entries_file = fopen(new_filename, WRITE_PERMISSIONS);
+				if (entries_file == NULL) 
+				{
+					/* if file couldn't be opened, write to stderr. */
+					printf(WRITING_PERMISSIONS_ERROR, new_filename);
+					return;
+				}
+			}
+			fprintf(entries_file, "%s,%d,%d\n", node->label_name, node->base, node->offset);
+		}
+		node = node->next;
+	}
+}
+
+/**
+ * @brief Create a externals file object
+ * 
+ * @param new_filename 
+ */
+void create_externals_file(char *new_filename)
+{
+    label_node* node;
+	FILE *externals_file;
+	if(externalLabelsList == NULL)
+		return;
+	
+	externals_file = NULL;
+	node = externalLabelsList->head;
+	while(node != NULL)
+	{
+		/* Open file, skip on failure, current assembly file descriptor to process */
+		if(externals_file == NULL)
+		{
+			externals_file = fopen(new_filename, WRITE_PERMISSIONS);
+			if (externals_file == NULL) 
+			{
+				/* if file couldn't be opened, write to stderr. */
+				printf(WRITING_PERMISSIONS_ERROR, new_filename);
+				return;
+			}
+		}
+		fprintf(externals_file, "%s BASE %.4d\n", node->label_name, node->base);
+		fprintf(externals_file, "%s OFFSET %.4d\n\n", node->label_name, node->offset);
+		node = node->next;
+	}
+}
+
 /**
  * @brief 
  * @return if label_name is label
@@ -436,6 +641,19 @@ static void labels_table_dispose_node(label_node* node)
 	free(node);
 }
 
+/**
+ * @brief 
+ * @return if label_name is label
+ */
+static void external_labels_table_dispose_node(label_node* node)
+{
+	if(node == NULL)
+		return;
+	external_labels_table_dispose_node(node->next);
+	free(node->label_name);
+	free(node);
+}
+
 static void labels_table_dispose()
 {
 	if(labelsList != NULL)
@@ -443,20 +661,10 @@ static void labels_table_dispose()
 		labels_table_dispose_node(labelsList->head);
 		free(labelsList);
 	}
-}
-
-void print_label_table()
-{
-	label_node* node;
-	if(labelsList == NULL)
-		return;
-	
-	node = labelsList->head;
-	printf("Label\tbase\toffset\tattributes #1, #2\t\t\n");
-	while(node != NULL)
+	if(externalLabelsList != NULL)
 	{
-		printf("%s\t%d\t%d\t%s, %s\t\n", node->label_name, node->base, node->offset, node->attribute[0], node->attribute[1]);
-		node = node->next;
+		external_labels_table_dispose_node(externalLabelsList->head);
+		free(externalLabelsList);
 	}
 }
 
