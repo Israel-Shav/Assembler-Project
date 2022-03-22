@@ -21,4 +21,6 @@ clean:
 	find . -type f -name "*.o"  -exec rm -f {} \;
 	find . -type f -name "*~" -exec rm -f {} \;
 	find . -type f -name "*.bak" -exec rm -f {} \;
-	find ./after_macro -type f -name "*.as" -exec rm -f {} \;
+	find ./after_macro -type f -name "*.am" -exec rm -f {} \;
+	rm ./assembler
+	rm ./output/*
