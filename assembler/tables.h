@@ -154,6 +154,15 @@ label_node *get_label(char *label_name);
 
 /**
  * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
+bool is_valid_label_name(char *label_name);
+
+/**
+ * @brief 
  * @return if label_name is label
  */
 bool is_label(char *label_name);

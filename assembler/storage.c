@@ -11,10 +11,10 @@
 /**
  * @brief 
  * 
- * @param decima 
+ * @param decimal
  * @param bit_size 
  */
-static void print_bits(int decima, unsigned int bit_size);
+static void print_bits(int decimal, unsigned int bit_size);
 
 /**
  * @brief 
@@ -34,23 +34,23 @@ static machine_word *storage[MEMORY_CAPACITY];
  * 
  */
 static struct action_element op_fuct_table[] = {
-		{"mov", MOV_OP, NONE_FUNCT, 2},
-		{"cmp",CMP_OP, NONE_FUNCT, 2},
-		{"add",ADD_OP, ADD_FUNCT, 2},
-		{"sub",SUB_OP, SUB_FUNCT, 2},
-		{"lea",LEA_OP, NONE_FUNCT, 2},
-		{"clr",CLR_OP, CLR_FUNCT, 1},
-		{"not",NOT_OP, NOT_FUNCT, 1},
-		{"inc",INC_OP, INC_FUNCT, 1},
-		{"dec",DEC_OP, DEC_FUNCT, 1},
-		{"jmp",JMP_OP, JMP_FUNCT, 1},
-		{"bne",BNE_OP, BNE_FUNCT, 1},
-		{"jsr",JSR_OP, JSR_FUNCT, 1},
-		{"red",RED_OP, NONE_FUNCT, 1},
-		{"prn",PRN_OP, NONE_FUNCT, 1},
-		{"rts",RTS_OP, NONE_FUNCT, 0},
-		{"stop",STOP_OP, NONE_FUNCT, 0},
-		{NULL, NONE_OP, NONE_FUNCT, 0}
+		{"mov", MOV_OP, NONE_FUNCT, 2, 0},
+		{"cmp",CMP_OP, NONE_FUNCT, 2, 1},
+		{"add",ADD_OP, ADD_FUNCT, 2, 2},
+		{"sub",SUB_OP, SUB_FUNCT, 2, 3},
+		{"lea",LEA_OP, NONE_FUNCT, 2, 4},
+		{"clr",CLR_OP, CLR_FUNCT, 1, 5},
+		{"not",NOT_OP, NOT_FUNCT, 1, 6},
+		{"inc",INC_OP, INC_FUNCT, 1, 7},
+		{"dec",DEC_OP, DEC_FUNCT, 1, 8},
+		{"jmp",JMP_OP, JMP_FUNCT, 1, 9},
+		{"bne",BNE_OP, BNE_FUNCT, 1, 10},
+		{"jsr",JSR_OP, JSR_FUNCT, 1, 11},
+		{"red",RED_OP, NONE_FUNCT, 1, 12},
+		{"prn",PRN_OP, NONE_FUNCT, 1, 13},
+		{"rts",RTS_OP, NONE_FUNCT, 0, 14},
+		{"stop",STOP_OP, NONE_FUNCT, 0, 15},
+		{NULL, NONE_OP, NONE_FUNCT, 0, 16}
 };
 
 
@@ -89,6 +89,27 @@ action_element *get_action(char *action_name)
 		if(op_fuct_table != NULL && op_fuct_table[i].action != NULL && strcmp(op_fuct_table[i].action, action_name) == 0)
 			return op_fuct_table + i;
     return op_fuct_table + i;
+}
+
+/**
+ * @brief 
+ * 
+ * @param register_name 
+ * @return true 
+ * @return false 
+ */
+reg is_register(char *register_name)
+{
+	int val;
+	if(register_name == NULL || strlen(register_name) == 0 || register_name[0] != 'r')
+	{
+		return NONE_REG;
+	}
+	val = (int)strtol(register_name + 1,(char **)NULL, 10);
+    if(val >= 0 && val <= 15)
+	    return val;
+    
+    return NONE_REG;
 }
 
 /**
@@ -235,6 +256,124 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
     return False;
 }
 
+
+/**
+ * @brief 
+ * 
+ * @param operand 
+ * @param codeWord 
+ * @param is_first_operand 
+ * @return true 
+ * @return false 
+ */
+static bool first_phase_opreand_update(char *operand, code_word *codeWord, bool is_first_operand);
+
+
+/**
+ * @brief 
+ * 
+ * @param operand 
+ * @param codeWord 
+ * @param is_first_operand 
+ * @return true 
+ * @return false 
+ */
+static bool first_phase_opreand_update(char *operand, code_word *codeWord, bool is_first_operand)
+{
+    char *token, *temp_str;
+    label_node *node;
+    data_word *dataWord;
+    int addr, register_id;
+    addr = register_id = 0;
+
+    if(operand == NULL)
+        return False;
+
+    if(strlen(operand) > 0 && operand[0] == '#')
+    {
+        dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+        storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[IC]->word).data = dataWord;
+        dataWord->data = (int)strtol(operand + 1, (char **)NULL, 10);
+        dataWord->ERA = 4;
+        dataWord->END = 0;
+        IC++;
+    }
+    else if(((node = get_label(operand)) != NULL || (is_register(operand) == NONE_REG && !is_action_exist(operand))) && is_valid_label_name(operand))
+    {
+        addr = 1;
+        dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+        storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[IC]->word).data = dataWord;
+        dataWord->data = 0;
+        dataWord->ERA = 4;
+        dataWord->END = 0;
+        IC++;
+        dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+        storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[IC]->word).data = dataWord;
+        dataWord->data = 0;
+        dataWord->ERA = 4;
+        dataWord->END = 0;
+        IC++;
+    }
+    else if((register_id = is_register(operand)) != NONE_REG)
+    {
+        addr = 3;
+        register_id = register_id;
+    }
+    else
+    {
+        temp_str = (char *)malloc_with_check(strlen(operand) + 1);
+        strcpy(temp_str, operand);
+        token = strtok(temp_str, TOKENS_DELIMITERS_SECOND_ADDR);
+        if(((node = get_label(token)) != NULL || (is_register(token) == NONE_REG && !is_action_exist(token))) && is_valid_label_name(token))
+        {
+            token = strtok(NULL, TOKENS_DELIMITERS_SECOND_ADDR);
+            if(token == NULL || (register_id = is_register(token)) == NONE_REG)
+            {
+                free(temp_str);
+                return False;
+            }
+            free(temp_str);
+            addr = 2;
+            register_id = register_id;
+            dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+            storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+            (storage[IC]->word).data = dataWord;
+            dataWord->data = 0;
+            dataWord->ERA = 4;
+            dataWord->END = 0;
+            IC++;
+            dataWord = (data_word *)malloc_with_check(sizeof(data_word));
+            storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+            (storage[IC]->word).data = dataWord;
+            dataWord->data = 0;
+            dataWord->ERA = 4;
+            dataWord->END = 0;
+            IC++;
+        }
+        else
+        {
+            free(temp_str);
+            return False;
+        }
+    }
+
+
+    if(is_first_operand)
+    {
+        codeWord->src_addressing = addr;
+        codeWord->src_register = register_id;
+    }
+    else
+    {
+        codeWord->dest_addressing = addr;
+        codeWord->dest_register = register_id;
+    }
+    return True;
+}
+
 /**
  * @brief 
  * 
@@ -248,12 +387,88 @@ bool encode_data(char *attribute, char *data, char *filename, int line_number)
 bool first_encode_instruction(char *action, char *operands, char *filename, int line_number)
 {
     action_element *action_e;
+    opcode_word *opcodeWord;
+    code_word *codeWord;
+    char *token, *temp_str;
+
     if ((action_e = get_action(action)) == NULL || action_e->action == NULL)
     {
         printf(ACTION_NOT_EXIST, filename, line_number, action);
         return False;
     }
-    printf("%s in line %d\n", operands, line_number);
+
+    if(action_e->opCount >= 0)
+    {
+        opcodeWord = (opcode_word *)malloc_with_check(sizeof(opcode_word));
+        storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[IC]->word).opcode = opcodeWord;
+        opcodeWord->opcode = pow(2, action_e->id);
+        opcodeWord->ERA = 4;
+        opcodeWord->END = 0;
+        IC++;
+    }
+    
+    if(action_e->opCount > 0)
+    {
+        temp_str = (char *)malloc_with_check(sizeof(operands)+1);
+        strcpy(temp_str, operands);
+        token = strtok(temp_str, TOKENS_DELIMITERS_COMMA);
+    }
+
+    if(operands && token != NULL && action_e->opCount >= 1)
+    {
+        codeWord = (code_word *)malloc_with_check(sizeof(code_word));
+        storage[IC] = (machine_word *)malloc_with_check(sizeof(machine_word));
+        (storage[IC]->word).code = codeWord;
+        codeWord->funct = action_e->fun;
+        codeWord->src_addressing = codeWord->src_register = codeWord->dest_addressing = codeWord->dest_register = 0;
+        codeWord->ERA = 4;
+        codeWord->END = 0;
+        IC++;
+        if(!first_phase_opreand_update(token, codeWord, action_e->opCount == 2))
+        {
+            printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+            free(temp_str);
+            return False;
+        }
+        token = strtok(NULL, TOKENS_DELIMITERS_COMMA);
+        if(action_e->opCount == 1 && token != NULL)
+        {
+            printf(NUM_OPERANDS_NOT_VALID, filename, line_number, operands);
+            free(temp_str);
+            return False;
+        }
+        else if(action_e->opCount == 2 && token != NULL)
+        {
+            if(!first_phase_opreand_update(token, codeWord, False))
+            {
+                printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+                free(temp_str);
+                return False;
+            }
+            token = strtok(NULL, TOKENS_DELIMITERS_COMMA);
+            if(token != NULL)
+            {
+                printf(NUM_OPERANDS_NOT_VALID, filename, line_number, operands);
+                free(temp_str);
+                return False;
+            }
+        }
+        /*else
+        {
+            printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+            free(temp_str);
+            return False;
+        }*/
+        free(temp_str);
+        return True;
+    }
+    else if(action_e->opCount !=  0)
+    {
+        printf(OPERANDS_NOT_VALID, filename, line_number, operands);
+        free(temp_str);
+        return False;
+    }
     return True;
 }
 
@@ -265,7 +480,7 @@ bool pre_second_phase_data_update()
 {
     ICF = IC;
     DCF = DC;
-    IC_COUNTER = 0;
+    IC_COUNTER = DEFAULT_IC;
     return after_first_phase_update(ICF);
 }
 
@@ -285,7 +500,16 @@ static void second_phase_word_update(char *word_name);
 static void second_phase_word_update(char *word_name)
 {
     label_node *node;
-    if((node = get_label(word_name)) != NULL)
+    char *temp_str, *token;
+
+    if(word_name == NULL)
+        return;
+
+    if(strlen(word_name) > 0 && word_name[0] == '#')
+    {
+        IC_COUNTER++;
+    }
+    else if((node = get_label(word_name)) != NULL)
     {
         /* Update first word in storage in place IC_COUNTER */
         if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
@@ -295,6 +519,31 @@ static void second_phase_word_update(char *word_name)
         if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
             storage[IC_COUNTER]->word.data->data = node->offset;
         IC_COUNTER++;
+    }
+    else 
+    {
+        temp_str = (char *)malloc_with_check(strlen(word_name) + 1);
+        strcpy(temp_str, word_name);
+        token = strtok(temp_str, TOKENS_DELIMITERS_SECOND_ADDR);
+        if((node = get_label(token)) != NULL)
+        {
+            token = strtok(NULL, TOKENS_DELIMITERS_SECOND_ADDR);
+            if(token == NULL)
+            {
+                free(temp_str);
+                return;
+            }
+            /* Update first word in storage in place IC_COUNTER */
+            if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
+                storage[IC_COUNTER]->word.data->data = node->base;
+            IC_COUNTER++;
+            /* Update second word in storage in place IC_COUNTER */
+            if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
+                storage[IC_COUNTER]->word.data->data = node->offset;
+            IC_COUNTER++;
+            
+        }
+        free(temp_str);
     }
 }
 
@@ -354,18 +603,18 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
-            external_label_manager(token, IC_COUNTER + DEFAULT_IC);
+            external_label_manager(token, IC_COUNTER );
         }
         else if(action_e->opCount == 2)
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
-            external_label_manager(token, IC_COUNTER + DEFAULT_IC);
+            external_label_manager(token, IC_COUNTER);
             token = strtok(NULL, TOKENS_DELIMITERS_COMMA);
             if(token != NULL)
             {
                 second_phase_word_update(token);
-                external_label_manager(token, IC_COUNTER + DEFAULT_IC);
+                external_label_manager(token, IC_COUNTER);
             }
             else 
             {

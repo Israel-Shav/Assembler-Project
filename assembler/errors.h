@@ -43,6 +43,8 @@
 
 #define OPERANDS_NOT_VALID "Error in %s:%d: operands are not valid, operands: %s\n"
 
+#define NUM_OPERANDS_NOT_VALID "Error in %s:%d: number of operands is not valid, operands: %s\n"
+
 
 
 

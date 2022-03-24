@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "globals.h"
+#include "storage.h"
 #include "tables.h"
 #include "errors.h"
 #include "utils.h"
@@ -499,6 +501,27 @@ label_node *get_label(char *label_name)
 		node = node->next;
 	}
     return NULL;
+}
+
+/**
+ * @brief 
+ * 
+ * @param label_name 
+ * @return true 
+ * @return false 
+ */
+bool is_valid_label_name(char *label_name)
+{
+	int i;
+	if(label_name == NULL || is_register(label_name) != NONE_REG || is_action_exist(label_name) || 
+	 (strlen(label_name) != 0 && !isalpha(label_name[0])))
+		return False;
+	for (i = 1; i <= MAX_LABEL_LEN && label_name[i] != STRING_END ; i++)
+		if(!isalnum(label_name[i]))
+			return False;
+	if(i == MAX_LABEL_LEN && label_name[i] != STRING_END)
+		return False;
+	return True;
 }
 
 
