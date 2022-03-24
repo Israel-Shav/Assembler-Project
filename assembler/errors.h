@@ -27,7 +27,7 @@
 
 #define UNKNOWN_INSTRUCTION "Error in %s:%d: UNKNOWN istructions.\n* instruction: \"%s\"\n"
 
-#define LABEL_NOT_FOUND_ADD_ENTRY "Error: \"%s\" not found in labels table.\n"
+#define LABEL_NOT_FOUND_ADD_ENTRY "Error: \"%s\" not found in labels table to add entry.\n"
 
 #define LABEL_ALREADY_EXIST "Error in %s:%d: label \"%s\" is aready exist.\n"
 
@@ -40,6 +40,8 @@
 #define STRING_NOT_VALID "Error in %s:%d: %s is NOT valid string for .string instruction.\n"
 
 #define ACTION_NOT_EXIST "Error in %s:%d: %s is NOT a valid instruction.\n"
+
+#define EMPTY_ACTION_LINE "Error in %s:%d: Empty action declaration.\n\tIn line: \"%s\"\n"
 
 #define OPERANDS_NOT_VALID "Error in %s:%d: operands are not valid, operands: %s\n"
 

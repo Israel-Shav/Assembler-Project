@@ -75,7 +75,8 @@ static bool process_file(char *filename)
 	storage_dispose();
     /* Full file name */
 	free(full_filename);
-
+	full_filename = NULL;
+	
 	/* Returns if the process is succeed */
 	return is_process_stable;
 }

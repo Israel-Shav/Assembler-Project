@@ -66,6 +66,7 @@ static void macros_table_dispose();
 bool init_macros_table()
 {
     macrosList = (macros_list *)malloc(sizeof(macros_list));
+	macrosList->head = NULL;
 	macrosList->size = 0;
     return True;
 }
@@ -112,10 +113,12 @@ bool insert_macro(char *macro_name, char *new_line)
 			return True;
 		}
 		node = node->next = (macro_node *)malloc(sizeof(macro_node));
+		node->next = NULL;
 	}
 	else
 	{
 		node = macrosList->head = (macro_node *)malloc(sizeof(macro_node));
+		node->next = NULL;
 	}
 	if (node == NULL) 
 	{
@@ -198,6 +201,7 @@ static void macros_table_dispose()
 	{
 		macros_table_dispose_node(macrosList->head);
 		free(macrosList);
+		macrosList = NULL;
 	}
 }
 
@@ -683,11 +687,13 @@ static void labels_table_dispose()
 	{
 		labels_table_dispose_node(labelsList->head);
 		free(labelsList);
+		labelsList = NULL;
 	}
 	if(externalLabelsList != NULL)
 	{
 		external_labels_table_dispose_node(externalLabelsList->head);
 		free(externalLabelsList);
+		externalLabelsList = NULL;
 	}
 }
 

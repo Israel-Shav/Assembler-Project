@@ -6,7 +6,9 @@ This project was done by [@Israel-Shav](//github.com/Israel-Shav) and [@roei2344
 For any issues, questions and ideas turn to the Issues tab.
 
 ## Usage
-`./assembler file1 file2 file3 ...` Will start the processing of each file (specify WITHOUT extension!). No support for double-quoting file names.
+1) cd ./assembler
+2) make
+3) `./assembler file1 file2 file3 ...` Will start the processing of each file (specify WITHOUT extension!). No support for double-quoting file names.
 
 ## Project structure:
     Modules:

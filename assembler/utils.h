@@ -7,6 +7,11 @@
         for (;string[(index)] && (string[(index)] == '\t' || string[(index)] == ' '); (++(index)))\
         ;
 
+/* moves the index to the next place in string where the char isn't white */
+#define SKIP_WHITE_CHARS_PNT(str_pnt) \
+        for (;str_pnt[0] && (str_pnt[0] == '\t' || str_pnt[0] == ' '); (++(str_pnt)))\
+        ;
+
 /**
  * @brief Prototypes:
  */

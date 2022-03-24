@@ -104,6 +104,7 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 		}
 	}
 
+
 	if(strcmp(token, ".entry") == 0)
 	{
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
@@ -113,12 +114,15 @@ static bool sp_line_process(char *line, bool *is_process_stable, char *filename,
 			free(copy_line);
 			return False;
 		}
+		SKIP_WHITE_CHARS_PNT(rest_of_str)
 		if(*is_process_stable)
 			*is_process_stable = add_entry_attribute(rest_of_str);
 	}
 	else if(is_action_exist(token))
 	{
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
+		if(rest_of_str != NULL)
+			SKIP_WHITE_CHARS_PNT(rest_of_str)
 		if(*is_process_stable)
 			*is_process_stable = second_encode_instruction(token, rest_of_str, filename, line_number);
 	}
