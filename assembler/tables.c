@@ -610,7 +610,7 @@ void create_entries_file(char *new_filename)
 					return;
 				}
 			}
-			fprintf(entries_file, "%s,%d,%d\n", node->label_name, node->base, node->offset);
+			fprintf(entries_file, "%s,%.4d,%.4d\n", node->label_name, node->base, node->offset);
 		}
 		node = node->next;
 	}

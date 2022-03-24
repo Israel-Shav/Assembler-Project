@@ -488,6 +488,7 @@ bool pre_second_phase_data_update()
  * @brief 
  * 
  * @param word_name 
+ * @param ic_counter 
  */
 static void second_phase_word_update(char *word_name);
 
@@ -496,6 +497,7 @@ static void second_phase_word_update(char *word_name);
  * @brief 
  * 
  * @param word_name 
+ * @param ic_counter 
  */
 static void second_phase_word_update(char *word_name)
 {
@@ -520,6 +522,8 @@ static void second_phase_word_update(char *word_name)
             storage[IC_COUNTER]->word.data->data = node->base;
             storage[IC_COUNTER]->word.data->ERA = is_external_label;
         }
+        if(is_external_label == 1)
+            insert_external_label(word_name, IC_COUNTER, IC_COUNTER + 1);
         IC_COUNTER++;
         /* Update second word in storage in place IC_COUNTER */
         if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
@@ -549,6 +553,8 @@ static void second_phase_word_update(char *word_name)
                 storage[IC_COUNTER]->word.data->data = node->base;
                 storage[IC_COUNTER]->word.data->ERA = is_external_label;
             }
+            if(is_external_label == 1)
+                insert_external_label(word_name, IC_COUNTER, IC_COUNTER + 1);
             IC_COUNTER++;
             /* Update second word in storage in place IC_COUNTER */
             if(IC_COUNTER >= DEFAULT_IC && IC_COUNTER < MEMORY_CAPACITY)
@@ -563,26 +569,6 @@ static void second_phase_word_update(char *word_name)
     }
 }
 
-/**
- * @brief 
- * 
- * @param word_name 
- * @param ic_counter 
- */
-static void external_label_manager(char *word_name, int ic_counter);
-
-/**
- * @brief 
- * 
- * @param word_name 
- * @param ic_counter 
- */
-static void external_label_manager(char *word_name, int ic_counter)
-{
-    int offset;
-    offset = ic_counter % 16;
-    insert_external_label(word_name, ic_counter - offset, offset);
-}
 
 /**
  * @brief 
@@ -620,17 +606,14 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
-            external_label_manager(token, IC_COUNTER );
         }
         else if(action_e->opCount == 2)
         {
             IC_COUNTER += 2;
             second_phase_word_update(token);
-            external_label_manager(token, IC_COUNTER);
             if(token_sec != NULL)
             {
                 second_phase_word_update(token_sec);
-                external_label_manager(token_sec, IC_COUNTER);
             }
             else 
             {
