@@ -66,8 +66,6 @@ typedef struct action_element {
 	funct fun;
 	/* Operands count */
 	int opCount;
-	/* id */
-	unsigned int id;
 } action_element;
 
 /* Represents a single opcode word */
@@ -187,10 +185,18 @@ bool second_encode_instruction(char *action, char *operands, char *filename, int
 bool pre_second_phase_data_update();
 
 /**
- * @brief 
- * @return dc VALUE
+ * @brief Get the dc object
+ * 
+ * @return int 
  */
 int get_dc();
+
+/**
+ * @brief Get the ic object
+ * 
+ * @return int 
+ */
+int get_ic();
 
 /**
  * @brief Create a object file object

@@ -84,7 +84,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	
 	char *token, *current_label, *copy_line, *rest_of_str, *attribute;
 	bool is_labeled;
-	int dc;
+	int dc, ic;
 
 	current_label = NULL;
 	copy_line = (char *)malloc_with_check(strlen(line) + 1);
@@ -164,11 +164,11 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	{
 		attribute = ".code";
 		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
-		dc = get_dc();
+		ic = get_ic();
 		if(*is_process_stable && (*is_process_stable = first_encode_instruction(token, rest_of_str, filename, line_number)) && is_labeled)
 		{
 			current_label = strtok(current_label, TOKENS_DELIMITERS_COLON);
-			if(!insert_label(current_label, attribute, dc - (dc % 16), dc % 16))
+			if(!insert_label(current_label, attribute, ic - (ic % 16), ic % 16))
 			{
 				free(copy_line);
 				return False;
