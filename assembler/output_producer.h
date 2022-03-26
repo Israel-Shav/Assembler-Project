@@ -19,7 +19,7 @@
  * 
  * @param filename 
  */
-void build_output_files(char *filename);
+void build_output_files(char *filename, bool debug_mode);
 
 /**
  * @brief Enums:

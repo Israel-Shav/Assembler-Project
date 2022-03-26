@@ -11,7 +11,7 @@
  * @param filename A filename without extension
  * @return Result status whether succeeded
  */
-static bool process_file(char *filename);
+static bool process_file(char *filename, bool debug_mode);
 
 /**
  * @brief Enums:

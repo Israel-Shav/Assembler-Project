@@ -148,7 +148,7 @@ static bool fp_line_process(char *line, bool *is_process_stable, char *filename,
 	else if(is_linked_instruction(token))
 	{
 		attribute = token;
-		rest_of_str = strtok(NULL, NEW_LINE_DELIMITERS);
+		rest_of_str = strtok(NULL, TOKENS_DELIMITERS);
 		if(rest_of_str == NULL)
 		{
 			printf(EMPTY_EXTERN_LINE, filename, line_number, copy_line);
